@@ -1,0 +1,39 @@
+esphome:
+  name: mppt-monitor
+  friendly_name: MPPT Monitor
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/yourusername/esphome-pcm60x
+      ref: main
+    components: [pcm60x]
+
+esp32:
+  board: esp32dev
+
+logger:
+  level: DEBUG
+
+api:
+  services:
+    - service: test_command
+      variables: {}
+      then:
+        - logger.log: "This is a test."
+
+ota:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+uart:
+  tx_pin: GPIO17
+  rx_pin: GPIO16
+  baud_rate: 2400
+  stop_bits: 1
+  parity: NONE
+
+pcm60x:
+
