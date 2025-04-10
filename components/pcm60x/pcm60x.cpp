@@ -14,9 +14,18 @@ void PCM60XComponent::loop() {
   this->send_command_("QPIGS");
   std::string response = this->receive_response_();
   if (!response.empty()) {
-    ESP_LOGD(TAG, "Received: %s", response.c_str());
+    this->parse_qpigs_(response);
   }
-  delay(5000);  // avoid hammering the serial port
+
+  delay(5000);
+
+  this->send_command_("QPIRI");
+  response = this->receive_response_();
+  if (!response.empty()) {
+    this->parse_qpiri_(response);
+  }
+
+  delay(10000);
 }
 
 void PCM60XComponent::send_command_(const std::string &command) {
@@ -37,7 +46,6 @@ std::string PCM60XComponent::receive_response_() {
   return result;
 }
 
-// CRC-16/IBM (Modbus-style)
 uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
   uint16_t crc = 0;
   for (char c : data) {
@@ -50,6 +58,30 @@ uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
     }
   }
   return crc;
+}
+
+void PCM60XComponent::parse_qpigs_(const std::string &data) {
+  // Expected response: (BBB.B CC.CC DD.DD ...<CRC>
+  auto parts = str_split(data, ' ');
+  if (parts.size() < 3) return;
+
+  float pv_voltage = parse_float(parts[0]).value_or(0);
+  float battery_voltage = parse_float(parts[1]).value_or(0);
+  float charging_current = parse_float(parts[2]).value_or(0);
+
+  if (this->pv_voltage_sensor_ != nullptr)
+    this->pv_voltage_sensor_->publish_state(pv_voltage);
+  if (this->battery_voltage_sensor_ != nullptr)
+    this->battery_voltage_sensor_->publish_state(battery_voltage);
+  if (this->charging_current_sensor_ != nullptr)
+    this->charging_current_sensor_->publish_state(charging_current);
+
+  ESP_LOGD(TAG, "QPIGS: PV=%.1fV, Bat=%.2fV, Current=%.2fA", pv_voltage, battery_voltage, charging_current);
+}
+
+void PCM60XComponent::parse_qpiri_(const std::string &data) {
+  // Example parsing placeholder
+  ESP_LOGD(TAG, "QPIRI Response: %s", data.c_str());
 }
 
 }  // namespace pcm60x
