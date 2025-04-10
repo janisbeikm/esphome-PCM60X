@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import uart
 from esphome.const import CONF_ID
 
-CODEOWNERS = ["@yjanisbeikm"]
+CODEOWNERS = ["@janisbeikm"]
 DEPENDENCIES = ["uart"]
 
 pcm60x_ns = cg.esphome_ns.namespace("pcm60x")
