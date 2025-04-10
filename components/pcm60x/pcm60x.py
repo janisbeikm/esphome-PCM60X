@@ -1,10 +1,9 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome import pins
-from esphome.components import uart, sensor
-from esphome.const import CONF_ID, UNIT_VOLT, ICON_FLASH, DEVICE_CLASS_VOLTAGE
+from esphome.components import uart
+from esphome.const import CONF_ID
 
-CODEOWNERS = ["@janisbeikm"]
+CODEOWNERS = ["@yjanisbeikm"]
 DEPENDENCIES = ["uart"]
 
 pcm60x_ns = cg.esphome_ns.namespace("pcm60x")
