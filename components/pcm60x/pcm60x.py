@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import uart, sensor
 from esphome.const import CONF_ID, UNIT_VOLT, UNIT_AMPERE, DEVICE_CLASS_VOLTAGE, ICON_FLASH
 
-CODEOWNERS = ["@yourusername"]
+CODEOWNERS = ["@janisbeikm"]
 DEPENDENCIES = ["uart"]
 
 pcm60x_ns = cg.esphome_ns.namespace("pcm60x")
