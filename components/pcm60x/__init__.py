@@ -4,7 +4,7 @@ from esphome.components import uart, sensor
 from esphome.const import CONF_ID, UNIT_VOLT, UNIT_AMPERE, DEVICE_CLASS_VOLTAGE, ICON_FLASH
 
 CODEOWNERS = ["@janisbeikm"]
-DEPENDENCIES = ["uart"]
+DEPENDENCIES = ["uart", "sensor"]
 
 pcm60x_ns = cg.esphome_ns.namespace("pcm60x")
 PCM60XComponent = pcm60x_ns.class_("PCM60XComponent", cg.Component, uart.UARTDevice)
