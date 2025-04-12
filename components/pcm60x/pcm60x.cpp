@@ -44,8 +44,9 @@ std::string PCM60XComponent::receive_response_() {
     if (c == '\r') break;
     result += c;
   }
-  return result;
   ESP_LOGD(TAG, "Raw response: %s", result.c_str());
+  return result;
+  
 }
 
 uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
