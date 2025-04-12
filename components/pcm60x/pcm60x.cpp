@@ -14,20 +14,29 @@ void PCM60XComponent::setup() {
 }
 
 void PCM60XComponent::update() {
-  ESP_LOGD(TAG, "Running update(), sending QPIGS1");
+  static std::vector<std::string> commands = {
+    "QPIGS", "QPIRI", "QPI", "QDI", "QVFW", "QPIWS", "QBEQI"
+  };
+  static size_t cmd_index = 0;
 
-  this->send_command_("QPIGS");
+  const std::string &cmd = commands[cmd_index];
+  ESP_LOGD(TAG, "Running update(), sending %s", cmd.c_str());
+  this->send_command_(cmd);
   std::string response = this->receive_response_();
+
   if (!response.empty()) {
-    this->parse_qpigs_(response);
+    ESP_LOGD(TAG, "Raw response to %s: %s", cmd.c_str(), response.c_str());
+    if (cmd == "QPIGS") {
+      this->parse_qpigs_(response);
+    } else if (cmd == "QPIRI") {
+      this->parse_qpiri_(response);
+    }
+    // Future: Add other parsers for QPI, QDI, etc.
+  } else {
+    ESP_LOGW(TAG, "No response received for %s", cmd.c_str());
   }
 
-  std::string test_cmd = "QPIGS";
-  this->send_command_(test_cmd);
-  response = this->receive_response_();
-  if (!response.empty()) {
-    this->parse_qpiri_(response);
-  }
+  cmd_index = (cmd_index + 1) % commands.size();
 }
 
 void PCM60XComponent::send_command_(const std::string &command) {
@@ -45,15 +54,10 @@ void PCM60XComponent::send_command_(const std::string &command) {
 
   uint16_t crc = this->calculate_crc_(raw, len);
   ESP_LOGD(TAG, "Calculated CRC: 0x%04X", crc);
- // if (command == "QPIGS") {
-//    crc = 0xB7A9;
-//    ESP_LOGD(TAG, "[OVERRIDE] Forcing CRC to 0xB7A9 for test");
-//}
-  
 
   std::string full_command = command;
-  full_command += static_cast<char>(crc >> 8);  // high byte first for PCM60X
-  full_command += static_cast<char>(crc & 0xFF);  // low byte
+  full_command += static_cast<char>(crc & 0xFF);  // low byte first
+  full_command += static_cast<char>(crc >> 8);    // high byte
   full_command += '\r';
 
   ESP_LOGD(TAG, "Sending command bytes:");
