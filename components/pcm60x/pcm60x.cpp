@@ -45,15 +45,15 @@ void PCM60XComponent::send_command_(const std::string &command) {
 
   uint16_t crc = this->calculate_crc_(raw, len);
   ESP_LOGD(TAG, "Calculated CRC: 0x%04X", crc);
-//  if (command == "QPIGS") {
+ // if (command == "QPIGS") {
 //    crc = 0xB7A9;
 //    ESP_LOGD(TAG, "[OVERRIDE] Forcing CRC to 0xB7A9 for test");
-//  }
+//}
   
 
   std::string full_command = command;
-  full_command += static_cast<char>(crc & 0xFF);  // ✅ low byte first
-  full_command += static_cast<char>(crc >> 8);    // ✅ high byte second  
+  full_command += static_cast<char>(crc >> 8);  // high byte first for PCM60X
+  full_command += static_cast<char>(crc & 0xFF);  // low byte
   full_command += '\r';
 
   ESP_LOGD(TAG, "Sending command bytes:");
