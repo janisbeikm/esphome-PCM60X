@@ -14,6 +14,7 @@ void PCM60XComponent::setup() {
 }
 
 void PCM60XComponent::update() {
+  ESP_LOGD(TAG, "Running update(), sending QPIGS");
   this->send_command_("QPIGS");
   std::string response = this->receive_response_();
   if (!response.empty()) {
@@ -33,6 +34,7 @@ void PCM60XComponent::send_command_(const std::string &command) {
   snprintf(buffer, sizeof(buffer), "%02X", crc);
   std::string full_command = command + buffer + "\r";
   this->write_str(full_command.c_str());
+  ESP_LOGD(TAG, "Sending command: %s", full_command.c_str());
 }
 
 std::string PCM60XComponent::receive_response_() {
@@ -43,6 +45,7 @@ std::string PCM60XComponent::receive_response_() {
     result += c;
   }
   return result;
+  ESP_LOGD(TAG, "Raw response: %s", result.c_str());
 }
 
 uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
