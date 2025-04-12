@@ -19,7 +19,7 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
  protected:
   void send_command_(const std::string &command);
   std::string receive_response_();
-  uint16_t calculate_crc_(const std::string &data);
+  uint16_t calculate_crc_(const char *data, size_t length);
   void parse_qpigs_(const std::string &data);
   void parse_qpiri_(const std::string &data);
 
