@@ -59,14 +59,14 @@ std::string PCM60XComponent::receive_response_() {
 }
 
 uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
-  uint16_t crc = 0;
+  uint16_t crc = 0xFFFF;
   for (char c : data) {
     crc ^= static_cast<uint8_t>(c);
-    for (int i = 0; i < 8; i++) {
-      if (crc & 0x0001)
+    for (int i = 0; i < 8; ++i) {
+      if (crc & 1)
         crc = (crc >> 1) ^ 0xA001;
       else
-        crc = crc >> 1;
+        crc >>= 1;
     }
   }
   return crc;
