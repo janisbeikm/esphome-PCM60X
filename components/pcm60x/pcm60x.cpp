@@ -15,13 +15,16 @@ void PCM60XComponent::setup() {
 
 void PCM60XComponent::update() {
   ESP_LOGD(TAG, "Running update(), sending QPIGS111");
+
   this->send_command_("QPIGS");
+  delay(100);  // allow time for response
   std::string response = this->receive_response_();
   if (!response.empty()) {
     this->parse_qpigs_(response);
   }
 
   this->send_command_("QPIRI");
+  delay(100);  // allow time for response
   response = this->receive_response_();
   if (!response.empty()) {
     this->parse_qpiri_(response);
@@ -29,15 +32,14 @@ void PCM60XComponent::update() {
 }
 
 void PCM60XComponent::send_command_(const std::string &command) {
-  // Force correct CRC for "QPIGS"
-  uint16_t crc = 0xB7A9;
+  uint16_t crc = this->calculate_crc_(command);
 
   ESP_LOGD(TAG, "Running send_command_ for: %s", command.c_str());
-  ESP_LOGD(TAG, "FORCED CRC: 0x%04X", crc);
+  ESP_LOGD(TAG, "Calculated CRC: 0x%04X", crc);
 
   std::string full_command = command;
-  full_command += static_cast<char>(crc & 0xFF);         // 0xA9
-  full_command += static_cast<char>((crc >> 8) & 0xFF);  // 0xB7
+  full_command += static_cast<char>(crc & 0xFF);         // low byte
+  full_command += static_cast<char>((crc >> 8) & 0xFF);  // high byte
   full_command += '\r';
 
   ESP_LOGD(TAG, "Sending command bytes:");
@@ -48,17 +50,28 @@ void PCM60XComponent::send_command_(const std::string &command) {
   }
 }
 
-
 std::string PCM60XComponent::receive_response_() {
-  std::string result;
+  // flush any leftover bytes
   while (this->available()) {
-    char c = this->read();
-    if (c == '\r') break;
-    result += c;
+    this->read();
   }
-  ESP_LOGD(TAG, "Raw response: %s", result.c_str());
-  return result;
-  
+
+  std::string result;
+  unsigned long start = millis();
+  while (millis() - start < 500) {  // timeout after 500ms
+    while (this->available()) {
+      char c = this->read();
+      if (c == '\r') {
+        ESP_LOGD(TAG, "Raw response: %s", result.c_str());
+        return result;
+      }
+      result += c;
+    }
+    delay(10);
+  }
+
+  ESP_LOGW(TAG, "No response received within timeout");
+  return "";
 }
 
 uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
@@ -77,7 +90,6 @@ uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
   return crc;
 }
 
-
 void PCM60XComponent::parse_qpigs_(const std::string &data) {
   std::vector<std::string> parts;
   std::string token;
@@ -92,7 +104,6 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
   }
 
   float pv_voltage = 0, battery_voltage = 0, charging_current = 0;
-
   char *end;
   pv_voltage = std::strtof(parts[0].c_str(), &end);
   battery_voltage = std::strtof(parts[1].c_str(), &end);
