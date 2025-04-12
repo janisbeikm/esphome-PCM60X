@@ -2,7 +2,9 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"    // str_split
 #include "esphome/core/optional.h"   // value_or
-#include "esphome/core/hal.h"        // parse_float
+#include "esphome/core/hal.h"  
+#include <sstream>
+#include <vector>      // parse_float
 
 
 namespace esphome {
@@ -66,8 +68,18 @@ uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
 
 void PCM60XComponent::parse_qpigs_(const std::string &data) {
   // Expected response: (BBB.B CC.CC DD.DD ...<CRC>
-  auto parts = str_split(data, ' ');
+  std::vector<std::string> parts;
+  std::string token;
+  std::istringstream stream(data);
+  while (std::getline(stream, token, ' ')) {
+    parts.push_back(token);
+  }
+  
   if (parts.size() < 3) return;
+  
+  float pv_voltage = std::stof(parts[0]);
+  float battery_voltage = std::stof(parts[1]);
+  float charging_current = std::stof(parts[2]);
 
   float pv_voltage = parse_float(parts[0]).value_or(0);
   float battery_voltage = parse_float(parts[1]).value_or(0);
