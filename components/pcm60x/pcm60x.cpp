@@ -30,9 +30,11 @@ void PCM60XComponent::update() {
 
 void PCM60XComponent::send_command_(const std::string &command) {
   uint16_t crc = calculate_crc_(command);
-  char buffer[10];
-  snprintf(buffer, sizeof(buffer), "%02X", crc);
-  std::string full_command = command + buffer + "\r";
+  std::string full_command = command;
+  full_command += static_cast<char>(crc & 0xFF);       // Low byte
+  full_command += static_cast<char>((crc >> 8) & 0xFF); // High byte
+  full_command += '\r';
+  
   this->write_str(full_command.c_str());
   ESP_LOGD(TAG, "Sending command: %s", full_command.c_str());
 }
