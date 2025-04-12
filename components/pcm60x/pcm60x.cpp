@@ -35,6 +35,16 @@ void PCM60XComponent::send_command_(const std::string &command) {
   const char* raw = command.c_str();
   size_t len = command.length();
 
+  if (command == "QPIGS") {
+    ESP_LOGD(TAG, "[DEBUG TEST] QPIGS calculated CRC should be 0xB7A9!");
+  }
+
+  ESP_LOGD(TAG, "Command string length: %d", (int)len);
+  for (size_t i = 0; i < len; ++i) {
+    ESP_LOGD(TAG, "Char %zu = 0x%02X (%c)", i, (uint8_t)command[i],
+              isprint(command[i]) ? command[i] : '.');
+  }
+
   uint16_t crc = this->calculate_crc_(raw, len);
   ESP_LOGD(TAG, "Calculated CRC: 0x%04X", crc);
 
@@ -50,6 +60,7 @@ void PCM60XComponent::send_command_(const std::string &command) {
     this->write((uint8_t)full_command[i]);
   }
 }
+
 
 
 std::string PCM60XComponent::receive_response_() {
