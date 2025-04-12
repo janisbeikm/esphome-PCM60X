@@ -7,7 +7,7 @@ CODEOWNERS = ["@janisbeikm"]
 DEPENDENCIES = ["uart", "sensor"]
 
 pcm60x_ns = cg.esphome_ns.namespace("pcm60x")
-PCM60XComponent = pcm60x_ns.class_("PCM60XComponent", cg.Component, uart.UARTDevice)
+PCM60XComponent = pcm60x_ns.class_("PCM60XComponent", cg.PollingComponent, uart.UARTDevice)
 
 CONF_PV_VOLTAGE = "pv_voltage"
 CONF_BATTERY_VOLTAGE = "battery_voltage"
@@ -32,7 +32,7 @@ CONFIG_SCHEMA = cv.Schema({
         accuracy_decimals=2,
         icon="mdi:current-dc",
     ),
-}).extend(uart.UART_DEVICE_SCHEMA)
+}).extend(cv.polling_component_schema("10s")).extend(uart.UART_DEVICE_SCHEMA)
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])

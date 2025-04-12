@@ -7,10 +7,10 @@
 namespace esphome {
 namespace pcm60x {
 
-class PCM60XComponent : public Component, public uart::UARTDevice {
+class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
  public:
   void setup() override;
-  void loop() override;
+  void update() override;
 
   void set_battery_voltage_sensor(sensor::Sensor *sensor) { battery_voltage_sensor_ = sensor; }
   void set_pv_voltage_sensor(sensor::Sensor *sensor) { pv_voltage_sensor_ = sensor; }

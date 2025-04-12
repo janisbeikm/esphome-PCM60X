@@ -4,7 +4,6 @@
 #include <vector>
 #include <cstdlib>  // for strtof()
 
-
 namespace esphome {
 namespace pcm60x {
 
@@ -14,22 +13,18 @@ void PCM60XComponent::setup() {
   ESP_LOGI(TAG, "Initializing PCM60X...");
 }
 
-void PCM60XComponent::loop() {
+void PCM60XComponent::update() {
   this->send_command_("QPIGS");
   std::string response = this->receive_response_();
   if (!response.empty()) {
     this->parse_qpigs_(response);
   }
 
-  delay(5000);
-
   this->send_command_("QPIRI");
   response = this->receive_response_();
   if (!response.empty()) {
     this->parse_qpiri_(response);
   }
-
-  delay(10000);
 }
 
 void PCM60XComponent::send_command_(const std::string &command) {
@@ -65,7 +60,6 @@ uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
 }
 
 void PCM60XComponent::parse_qpigs_(const std::string &data) {
-  // Split by space
   std::vector<std::string> parts;
   std::string token;
   std::istringstream stream(data);
@@ -80,7 +74,6 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
 
   float pv_voltage = 0, battery_voltage = 0, charging_current = 0;
 
-  // Manual float parsing (no try/catch)
   char *end;
   pv_voltage = std::strtof(parts[0].c_str(), &end);
   battery_voltage = std::strtof(parts[1].c_str(), &end);
@@ -96,9 +89,7 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
   ESP_LOGD(TAG, "QPIGS: PV=%.1fV, Bat=%.2fV, Current=%.2fA", pv_voltage, battery_voltage, charging_current);
 }
 
-
 void PCM60XComponent::parse_qpiri_(const std::string &data) {
-  // Placeholder for later parsing
   ESP_LOGD(TAG, "QPIRI Response: %s", data.c_str());
 }
 
