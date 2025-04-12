@@ -30,7 +30,9 @@ void PCM60XComponent::update() {
 }
 
 void PCM60XComponent::send_command_(const std::string &command) {
-  ESP_LOGD(TAG, "[DEBUG TEST] QPIGS calculated CRC should be 0xB7A9!");
+  if (command == "QPIGS") {
+    ESP_LOGD(TAG, "[DEBUG TEST] QPIGS calculated CRC should be 0xB7A9!");
+  }
 
   const char* raw = command.c_str();
   size_t len = command.length();
@@ -44,8 +46,8 @@ void PCM60XComponent::send_command_(const std::string &command) {
   ESP_LOGD(TAG, "Calculated CRC: 0x%04X", crc);
 
   std::string full_command = command;
-  full_command += static_cast<char>(crc & 0xFF);         // low byte
-  full_command += static_cast<char>((crc >> 8) & 0xFF);  // high byte
+  full_command += static_cast<char>(crc >> 8);  // high byte first for PCM60X
+  full_command += static_cast<char>(crc & 0xFF);  // low byte
   full_command += '\r';
 
   ESP_LOGD(TAG, "Sending command bytes:");
@@ -80,7 +82,7 @@ std::string PCM60XComponent::receive_response_() {
 }
 
 uint16_t PCM60XComponent::calculate_crc_(const char* data, size_t length) {
-  uint16_t crc = 0xFFFF;  // ✅ correct start for PCM60X CRC
+  uint16_t crc = 0x0000;  // corrected start for PCM60X CRC
   for (size_t pos = 0; pos < length; pos++) {
     crc ^= static_cast<uint8_t>(data[pos]);
     for (int i = 0; i < 8; i++) {
