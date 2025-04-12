@@ -30,6 +30,7 @@ void PCM60XComponent::update() {
 
 void PCM60XComponent::send_command_(const std::string &command) {
   uint16_t crc = calculate_crc_(command);
+  ESP_LOGD(TAG, "CRC of '%s' = 0x%04X", command.c_str(), crc);  // ✅ force confirmation
   std::string full_command = command;
   full_command += static_cast<char>(crc & 0xFF);         // low byte
   full_command += static_cast<char>((crc >> 8) & 0xFF);  // high byte
