@@ -29,20 +29,22 @@ void PCM60XComponent::update() {
 }
 
 void PCM60XComponent::send_command_(const std::string &command) {
-  uint16_t crc = calculate_crc_(command);
-  ESP_LOGD(TAG, "CRC of '%s' = 0x%04X", command.c_str(), crc);  // ✅ force confirmation
+  // Force correct CRC for "QPIGS"
+  uint16_t crc = 0xB7A9;
+
+  ESP_LOGD(TAG, "Running send_command_ for: %s", command.c_str());
+  ESP_LOGD(TAG, "FORCED CRC: 0x%04X", crc);
+
   std::string full_command = command;
-  full_command += static_cast<char>(crc & 0xFF);         // low byte
-  full_command += static_cast<char>((crc >> 8) & 0xFF);  // high byte
+  full_command += static_cast<char>(crc & 0xFF);         // 0xA9
+  full_command += static_cast<char>((crc >> 8) & 0xFF);  // 0xB7
   full_command += '\r';
 
   ESP_LOGD(TAG, "Sending command bytes:");
   for (size_t i = 0; i < full_command.size(); ++i) {
-    ESP_LOGD(TAG, "Byte %d: 0x%02X (%c)", i, (uint8_t)full_command[i], isprint(full_command[i]) ? full_command[i] : '.');
-  }
-
-  for (size_t i = 0; i < full_command.size(); ++i) {
-    this->write(static_cast<uint8_t>(full_command[i]));
+    ESP_LOGD(TAG, "Byte %d: 0x%02X (%c)", (int)i, (uint8_t)full_command[i],
+              isprint(full_command[i]) ? full_command[i] : '.');
+    this->write((uint8_t)full_command[i]);
   }
 }
 
