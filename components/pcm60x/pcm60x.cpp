@@ -52,8 +52,8 @@ void PCM60XComponent::send_command_(const std::string &command) {
   
 
   std::string full_command = command;
-  full_command += static_cast<char>(crc >> 8);  // high byte first for PCM60X
-  full_command += static_cast<char>(crc & 0xFF);  // low byte
+  full_command += static_cast<char>(crc & 0xFF);  // ✅ low byte first
+  full_command += static_cast<char>(crc >> 8);    // ✅ high byte second  
   full_command += '\r';
 
   ESP_LOGD(TAG, "Sending command bytes:");
