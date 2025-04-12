@@ -32,9 +32,10 @@ void PCM60XComponent::update() {
 }
 
 void PCM60XComponent::send_command_(const std::string &command) {
-  uint16_t crc = this->calculate_crc_(command);
+  const char* raw = command.c_str();
+  size_t len = command.length();
 
-  ESP_LOGD(TAG, "Running send_command_ for: %s", command.c_str());
+  uint16_t crc = this->calculate_crc_(raw, len);
   ESP_LOGD(TAG, "Calculated CRC: 0x%04X", crc);
 
   std::string full_command = command;
@@ -49,6 +50,7 @@ void PCM60XComponent::send_command_(const std::string &command) {
     this->write((uint8_t)full_command[i]);
   }
 }
+
 
 std::string PCM60XComponent::receive_response_() {
   // flush any leftover bytes
@@ -74,11 +76,10 @@ std::string PCM60XComponent::receive_response_() {
   return "";
 }
 
-uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
+uint16_t PCM60XComponent::calculate_crc_(const char* data, size_t length) {
   uint16_t crc = 0xFFFF;
-  for (size_t pos = 0; pos < data.length(); pos++) {
-    crc ^= static_cast<uint8_t>(data[pos]);  // XOR byte into least sig. byte of crc
-
+  for (size_t pos = 0; pos < length; pos++) {
+    crc ^= static_cast<uint8_t>(data[pos]);
     for (int i = 0; i < 8; i++) {
       if ((crc & 0x0001) != 0) {
         crc >>= 1;
@@ -90,6 +91,7 @@ uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
   }
   return crc;
 }
+
 
 
 void PCM60XComponent::parse_qpigs_(const std::string &data) {
