@@ -10,21 +10,19 @@ namespace pcm60x {
 static const char *const TAG = "pcm60x";
 
 void PCM60XComponent::setup() {
-  ESP_LOGI(TAG, "Initializing PCM60X...");
+  ESP_LOGI(TAG, "Initializing PCM60X.");
 }
 
 void PCM60XComponent::update() {
   ESP_LOGD(TAG, "Running update(), sending QPIGS1");
 
   this->send_command_("QPIGS");
-  delay(100);  // allow time for response
   std::string response = this->receive_response_();
   if (!response.empty()) {
     this->parse_qpigs_(response);
   }
 
   this->send_command_("QPIRI");
-  delay(100);  // allow time for response
   response = this->receive_response_();
   if (!response.empty()) {
     this->parse_qpiri_(response);
@@ -32,17 +30,14 @@ void PCM60XComponent::update() {
 }
 
 void PCM60XComponent::send_command_(const std::string &command) {
+  ESP_LOGD(TAG, "[DEBUG TEST] QPIGS calculated CRC should be 0xB7A9!");
+
   const char* raw = command.c_str();
   size_t len = command.length();
 
-  if (command == "QPIGS") {
-    ESP_LOGD(TAG, "[DEBUG TEST] QPIGS calculated CRC should be 0xB7A9!");
-  }
-
-  ESP_LOGD(TAG, "Command string length: %d", (int)len);
-  for (size_t i = 0; i < len; ++i) {
-    ESP_LOGD(TAG, "Char %zu = 0x%02X (%c)", i, (uint8_t)command[i],
-              isprint(command[i]) ? command[i] : '.');
+  ESP_LOGD(TAG, "Command string length: %d", static_cast<int>(len));
+  for (size_t i = 0; i < len; i++) {
+    ESP_LOGD(TAG, "Char %d = 0x%02X (%c)", static_cast<int>(i), (uint8_t)raw[i], isprint(raw[i]) ? raw[i] : '.');
   }
 
   uint16_t crc = this->calculate_crc_(raw, len);
@@ -61,17 +56,14 @@ void PCM60XComponent::send_command_(const std::string &command) {
   }
 }
 
-
-
 std::string PCM60XComponent::receive_response_() {
-  // flush any leftover bytes
   while (this->available()) {
-    this->read();
+    this->read();  // flush leftovers
   }
 
   std::string result;
   unsigned long start = millis();
-  while (millis() - start < 500) {  // timeout after 500ms
+  while (millis() - start < 500) {
     while (this->available()) {
       char c = this->read();
       if (c == '\r') {
@@ -88,7 +80,7 @@ std::string PCM60XComponent::receive_response_() {
 }
 
 uint16_t PCM60XComponent::calculate_crc_(const char* data, size_t length) {
-  uint16_t crc = 0x0000;
+  uint16_t crc = 0xFFFF;  // ✅ correct start for PCM60X CRC
   for (size_t pos = 0; pos < length; pos++) {
     crc ^= static_cast<uint8_t>(data[pos]);
     for (int i = 0; i < 8; i++) {
@@ -102,8 +94,6 @@ uint16_t PCM60XComponent::calculate_crc_(const char* data, size_t length) {
   }
   return crc;
 }
-
-
 
 void PCM60XComponent::parse_qpigs_(const std::string &data) {
   std::vector<std::string> parts;
