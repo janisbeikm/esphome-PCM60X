@@ -1,11 +1,7 @@
 #include "pcm60x.h"
 #include "esphome/core/log.h"
-#include "esphome/core/helpers.h"    // str_split
-#include "esphome/core/optional.h"   // value_or
-#include "esphome/core/hal.h"  
 #include <sstream>
-#include <vector>      // parse_float
-
+#include <vector>
 
 namespace esphome {
 namespace pcm60x {
@@ -67,36 +63,40 @@ uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
 }
 
 void PCM60XComponent::parse_qpigs_(const std::string &data) {
-  // Expected response: (BBB.B CC.CC DD.DD ...<CRC>
+  // Split by space
   std::vector<std::string> parts;
   std::string token;
   std::istringstream stream(data);
   while (std::getline(stream, token, ' ')) {
     parts.push_back(token);
   }
-  
-  if (parts.size() < 3) return;
-  
-  float pv_voltage = std::stof(parts[0]);
-  float battery_voltage = std::stof(parts[1]);
-  float charging_current = std::stof(parts[2]);
 
-  float pv_voltage = parse_float(parts[0]).value_or(0);
-  float battery_voltage = parse_float(parts[1]).value_or(0);
-  float charging_current = parse_float(parts[2]).value_or(0);
+  if (parts.size() < 3) {
+    ESP_LOGW(TAG, "QPIGS response too short");
+    return;
+  }
 
-  if (this->pv_voltage_sensor_ != nullptr)
-    this->pv_voltage_sensor_->publish_state(pv_voltage);
-  if (this->battery_voltage_sensor_ != nullptr)
-    this->battery_voltage_sensor_->publish_state(battery_voltage);
-  if (this->charging_current_sensor_ != nullptr)
-    this->charging_current_sensor_->publish_state(charging_current);
+  try {
+    float pv_voltage = std::stof(parts[0]);
+    float battery_voltage = std::stof(parts[1]);
+    float charging_current = std::stof(parts[2]);
 
-  ESP_LOGD(TAG, "QPIGS: PV=%.1fV, Bat=%.2fV, Current=%.2fA", pv_voltage, battery_voltage, charging_current);
+    if (this->pv_voltage_sensor_ != nullptr)
+      this->pv_voltage_sensor_->publish_state(pv_voltage);
+    if (this->battery_voltage_sensor_ != nullptr)
+      this->battery_voltage_sensor_->publish_state(battery_voltage);
+    if (this->charging_current_sensor_ != nullptr)
+      this->charging_current_sensor_->publish_state(charging_current);
+
+    ESP_LOGD(TAG, "QPIGS: PV=%.1fV, Bat=%.2fV, Current=%.2fA", pv_voltage, battery_voltage, charging_current);
+
+  } catch (const std::exception &e) {
+    ESP_LOGW(TAG, "Failed to parse QPIGS response: %s", e.what());
+  }
 }
 
 void PCM60XComponent::parse_qpiri_(const std::string &data) {
-  // Example parsing placeholder
+  // Placeholder for later parsing
   ESP_LOGD(TAG, "QPIRI Response: %s", data.c_str());
 }
 
