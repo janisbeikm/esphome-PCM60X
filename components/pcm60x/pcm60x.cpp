@@ -14,7 +14,7 @@ void PCM60XComponent::setup() {
 }
 
 void PCM60XComponent::update() {
-  ESP_LOGD(TAG, "Running update(), sending QPIGS111");
+  ESP_LOGD(TAG, "Running update(), sending QPIGS1");
 
   this->send_command_("QPIGS");
   delay(100);  // allow time for response
