@@ -1,6 +1,9 @@
 #include "pcm60x.h"
 #include "esphome/core/log.h"
-#include "esphome/core/helpers.h"
+#include "esphome/core/helpers.h"    // str_split
+#include "esphome/core/optional.h"   // value_or
+#include "esphome/core/hal.h"        // parse_float
+
 
 namespace esphome {
 namespace pcm60x {
