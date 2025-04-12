@@ -1,5 +1,6 @@
 #include "pcm60x.h"
 #include "esphome/core/log.h"
+#include "esphome/core/helpers.h"
 
 namespace esphome {
 namespace pcm60x {
