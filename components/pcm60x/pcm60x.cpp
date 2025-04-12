@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <cstdlib>  // for strtof()
+#include <iomanip>  // for hex formatting
 
 namespace esphome {
 namespace pcm60x {
@@ -61,11 +62,18 @@ void PCM60XComponent::send_command_(const std::string &command) {
   full_command += '\r';
 
   ESP_LOGD(TAG, "Sending command bytes:");
+  std::ostringstream debug_stream;
+  debug_stream << "Sent command: ";
   for (size_t i = 0; i < full_command.size(); ++i) {
-    ESP_LOGD(TAG, "Byte %d: 0x%02X (%c)", (int)i, (uint8_t)full_command[i],
-              isprint(full_command[i]) ? full_command[i] : '.');
-    this->write((uint8_t)full_command[i]);
+    uint8_t byte = static_cast<uint8_t>(full_command[i]);
+    ESP_LOGD(TAG, "Byte %d: 0x%02X (%c)", (int)i, byte,
+             isprint(byte) ? byte : '.');
+    this->write(byte);
+
+    debug_stream << std::hex << std::uppercase << std::setfill('0')
+                 << "0x" << std::setw(2) << static_cast<int>(byte) << " ";
   }
+  ESP_LOGD(TAG, "%s", debug_stream.str().c_str());
 }
 
 std::string PCM60XComponent::receive_response_() {
