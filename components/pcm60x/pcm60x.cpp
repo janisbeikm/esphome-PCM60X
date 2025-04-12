@@ -75,11 +75,12 @@ std::string PCM60XComponent::receive_response_() {
 }
 
 uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
-  uint16_t crc = 0;
-  for (size_t i = 0; i < data.size(); i++) {
-    crc ^= static_cast<uint8_t>(data[i]);
-    for (int j = 0; j < 8; j++) {
-      if (crc & 0x0001) {
+  uint16_t crc = 0xFFFF;
+  for (size_t pos = 0; pos < data.length(); pos++) {
+    crc ^= static_cast<uint8_t>(data[pos]);  // XOR byte into least sig. byte of crc
+
+    for (int i = 0; i < 8; i++) {
+      if ((crc & 0x0001) != 0) {
         crc >>= 1;
         crc ^= 0xA001;
       } else {
@@ -89,6 +90,7 @@ uint16_t PCM60XComponent::calculate_crc_(const std::string &data) {
   }
   return crc;
 }
+
 
 void PCM60XComponent::parse_qpigs_(const std::string &data) {
   std::vector<std::string> parts;
