@@ -88,7 +88,7 @@ std::string PCM60XComponent::receive_response_() {
 }
 
 uint16_t PCM60XComponent::calculate_crc_(const char* data, size_t length) {
-  uint16_t crc = 0x0000;  // corrected start for PCM60X CRC
+  uint16_t crc = 0xFFFF;  // corrected start for PCM60X CRC
   for (size_t pos = 0; pos < length; pos++) {
     crc ^= static_cast<uint8_t>(data[pos]);
     for (int i = 0; i < 8; i++) {
