@@ -14,7 +14,7 @@ void PCM60XComponent::setup() {
 }
 
 void PCM60XComponent::update() {
-  ESP_LOGD(TAG, "Running update(), sending QPIGS");
+  ESP_LOGD(TAG, "Running update(), sending QPIGS111");
   this->send_command_("QPIGS");
   std::string response = this->receive_response_();
   if (!response.empty()) {
