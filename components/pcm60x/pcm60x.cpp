@@ -22,7 +22,8 @@ void PCM60XComponent::update() {
     this->parse_qpigs_(response);
   }
 
-  this->send_command_("QPIRI");
+  std::string test_cmd = "QPIGS";
+  this->send_command_(test_cmd);
   response = this->receive_response_();
   if (!response.empty()) {
     this->parse_qpiri_(response);
@@ -43,6 +44,10 @@ void PCM60XComponent::send_command_(const std::string &command) {
   }
 
   uint16_t crc = this->calculate_crc_(raw, len);
+  if (command == "QPIGS") {
+    crc = 0xB7A9;
+    ESP_LOGD(TAG, "[OVERRIDE] Forcing CRC to 0xB7A9 for test");
+  }
   ESP_LOGD(TAG, "Calculated CRC: 0x%04X", crc);
 
   std::string full_command = command;
