@@ -31,13 +31,17 @@ void PCM60XComponent::update() {
 void PCM60XComponent::send_command_(const std::string &command) {
   uint16_t crc = calculate_crc_(command);
   std::string full_command = command;
-  full_command += static_cast<char>(crc & 0xFF);       // Low byte
-  full_command += static_cast<char>((crc >> 8) & 0xFF); // High byte
+  full_command += static_cast<char>(crc & 0xFF);         // low byte
+  full_command += static_cast<char>((crc >> 8) & 0xFF);  // high byte
   full_command += '\r';
-  
-  this->write((const uint8_t *)full_command.data(), full_command.size());
-  ESP_LOGD(TAG, "Sending command: %s", full_command.c_str());
+
+  ESP_LOGD(TAG, "Sending command: %s [len=%d]", command.c_str(), (int)full_command.size());
+
+  for (size_t i = 0; i < full_command.size(); ++i) {
+    this->write(static_cast<uint8_t>(full_command[i]));
+  }
 }
+
 
 std::string PCM60XComponent::receive_response_() {
   std::string result;
