@@ -35,7 +35,7 @@ void PCM60XComponent::send_command_(const std::string &command) {
   full_command += static_cast<char>((crc >> 8) & 0xFF); // High byte
   full_command += '\r';
   
-  this->write_str(full_command.c_str());
+  this->write((const uint8_t *)full_command.data(), full_command.size());
   ESP_LOGD(TAG, "Sending command: %s", full_command.c_str());
 }
 
