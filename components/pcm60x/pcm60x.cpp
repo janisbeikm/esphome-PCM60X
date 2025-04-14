@@ -176,7 +176,7 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
   while (std::getline(stream, token, ' ')) {
     parts.push_back(token);
   }
-
+  ESP_LOGD(TAG, "QPIRI part count: %d", parts.size());
   if (parts.size() < 13) {
     ESP_LOGW(TAG, "QPIRI response too short, got %d parts", parts.size());
     return;
@@ -239,7 +239,7 @@ void PCM60XComponent::parse_qdi_(const std::string &data) {
   while (std::getline(stream, token, ' ')) {
     parts.push_back(token);
   }
-
+  ESP_LOGD(TAG, "QDI part count: %d", parts.size());
   if (parts.size() < 9) {
     ESP_LOGW(TAG, "QDI response too short, got %d parts", parts.size());
     return;
