@@ -157,6 +157,8 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
   ESP_LOGD(TAG, "QPIRI Response: %s", data.c_str());
 
   int max_output_power = std::atoi(parts[0].c_str());
+  if (max_output_power == 0) max_output_power = std::strtol(parts[0].c_str(), nullptr, 10);
+
   float nominal_battery_voltage = std::strtof(parts[1].c_str(), nullptr);
   float nominal_charging_current = std::strtof(parts[2].c_str(), nullptr);
   float absorption_voltage = std::strtof(parts[3].c_str(), nullptr);
