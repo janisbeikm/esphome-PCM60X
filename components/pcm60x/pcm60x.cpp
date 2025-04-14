@@ -3,7 +3,6 @@
 #include <sstream>
 #include <vector>
 #include <cstdlib>  // for strtof()
-#include <iomanip>  // for hex formatting
 
 namespace esphome {
 namespace pcm60x {
@@ -32,7 +31,6 @@ void PCM60XComponent::update() {
     } else if (cmd == "QPIRI") {
       this->parse_qpiri_(response);
     }
-    // Future: Add other parsers for QPI, QDI, etc.
   } else {
     ESP_LOGW(TAG, "No response received for %s", cmd.c_str());
   }
@@ -57,28 +55,27 @@ void PCM60XComponent::send_command_(const std::string &command) {
   ESP_LOGD(TAG, "Calculated CRC: 0x%04X", crc);
 
   std::string full_command = command;
-  full_command += static_cast<char>(crc >> 8);  // high byte first for PCM60X
-  full_command += static_cast<char>(crc & 0xFF);  // low byte
+  full_command += static_cast<char>(crc >> 8);
+  full_command += static_cast<char>(crc & 0xFF);
   full_command += '\r';
 
   ESP_LOGD(TAG, "Sending command bytes:");
-  std::ostringstream debug_stream;
-  debug_stream << "Sent command: ";
   for (size_t i = 0; i < full_command.size(); ++i) {
-    uint8_t byte = static_cast<uint8_t>(full_command[i]);
-    ESP_LOGD(TAG, "Byte %d: 0x%02X (%c)", (int)i, byte,
-             isprint(byte) ? byte : '.');
-    this->write(byte);
-
-    debug_stream << std::hex << std::uppercase << std::setfill('0')
-                 << "0x" << std::setw(2) << static_cast<int>(byte) << " ";
+    ESP_LOGD(TAG, "Byte %d: 0x%02X (%c)", (int)i, (uint8_t)full_command[i],
+              isprint(full_command[i]) ? full_command[i] : '.');
+    this->write((uint8_t)full_command[i]);
   }
-  ESP_LOGD(TAG, "%s", debug_stream.str().c_str());
+
+  std::ostringstream hex_stream;
+  for (size_t i = 0; i < full_command.size(); ++i) {
+    hex_stream << "0x" << std::hex << std::uppercase << (int)(uint8_t)full_command[i] << " ";
+  }
+  ESP_LOGD(TAG, "Sent command: %s", hex_stream.str().c_str());
 }
 
 std::string PCM60XComponent::receive_response_() {
   while (this->available()) {
-    this->read();  // flush leftovers
+    this->read();
   }
 
   std::string result;
@@ -101,7 +98,6 @@ std::string PCM60XComponent::receive_response_() {
 
 uint16_t PCM60XComponent::calculate_crc_(const char* data, size_t length) {
   uint16_t crc = 0x0000;
-
   for (size_t i = 0; i < length; i++) {
     crc ^= (static_cast<uint8_t>(data[i]) << 8);
     for (int j = 0; j < 8; j++) {
@@ -110,10 +106,9 @@ uint16_t PCM60XComponent::calculate_crc_(const char* data, size_t length) {
       } else {
         crc <<= 1;
       }
-      crc &= 0xFFFF;  // trim to 16 bits
+      crc &= 0xFFFF;
     }
   }
-
   return crc;
 }
 
@@ -147,7 +142,54 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
 }
 
 void PCM60XComponent::parse_qpiri_(const std::string &data) {
+  std::vector<std::string> parts;
+  std::string token;
+  std::istringstream stream(data);
+  while (std::getline(stream, token, ' ')) {
+    parts.push_back(token);
+  }
+
+  if (parts.size() < 13) {
+    ESP_LOGW(TAG, "QPIRI response too short, got %d parts", parts.size());
+    return;
+  }
+
   ESP_LOGD(TAG, "QPIRI Response: %s", data.c_str());
+
+  float max_output_power = std::strtof(parts[0].c_str(), nullptr);
+  float nominal_battery_voltage = std::strtof(parts[1].c_str(), nullptr);
+  float nominal_charging_current = std::strtof(parts[2].c_str(), nullptr);
+  float absorption_voltage = std::strtof(parts[3].c_str(), nullptr);
+  float float_voltage = std::strtof(parts[4].c_str(), nullptr);
+
+  std::string battery_type = (parts[5] == "0") ? "AGM" :
+                             (parts[5] == "1") ? "Flooded" :
+                             (parts[5] == "2") ? "User" : "Unknown";
+  std::string remote_batt_voltage_detect = (parts[6] == "1") ? "Yes" : "No";
+  float temp_compensation = std::strtof(parts[7].c_str(), nullptr);
+  std::string remote_temp_detect = (parts[8] == "1") ? "Yes" : "No";
+  std::string battery_rated_voltage_set = (parts[9] == "0") ? "12V" :
+                                          (parts[9] == "1") ? "24V" :
+                                          (parts[9] == "2") ? "36V" :
+                                          (parts[9] == "3") ? "48V" : "Unknown";
+  float batteries_in_series = std::strtof(parts[10].c_str(), nullptr);
+  float low_warning_voltage = std::strtof(parts[11].c_str(), nullptr);
+  std::string low_shutdown_detect = (parts[12] == "1") ? "Enabled" : "Disabled";
+
+  ESP_LOGD(TAG, "QPIRI decoded:");
+  ESP_LOGD(TAG, "Max Output Power: %.0f W", max_output_power);
+  ESP_LOGD(TAG, "Nominal Battery Voltage: %.1f V", nominal_battery_voltage);
+  ESP_LOGD(TAG, "Nominal Charging Current: %.1f A", nominal_charging_current);
+  ESP_LOGD(TAG, "Absorption Voltage: %.2f V", absorption_voltage);
+  ESP_LOGD(TAG, "Float Voltage: %.2f V", float_voltage);
+  ESP_LOGD(TAG, "Battery Type: %s", battery_type.c_str());
+  ESP_LOGD(TAG, "Remote Batt Voltage Detect: %s", remote_batt_voltage_detect.c_str());
+  ESP_LOGD(TAG, "Temp Compensation: %.1f mV/unit/°C", temp_compensation);
+  ESP_LOGD(TAG, "Remote Temp Detect: %s", remote_temp_detect.c_str());
+  ESP_LOGD(TAG, "Battery Rated V Set: %s", battery_rated_voltage_set.c_str());
+  ESP_LOGD(TAG, "Batteries in Series: %.0f", batteries_in_series);
+  ESP_LOGD(TAG, "Low Warning Voltage: %.2f V", low_warning_voltage);
+  ESP_LOGD(TAG, "Low Shutdown Detect: %s", low_shutdown_detect.c_str());
 }
 
 }  // namespace pcm60x
