@@ -174,7 +174,7 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
 
   const char* battery_type_str = battery_type == 0 ? "AGM" :
                                  battery_type == 1 ? "Flooded" :
-                                 battery_type == 2 ? "User" : "Unknown";
+                                 battery_type == 2 ? "User";
 
   const char* remote_batt_str = remote_battery_voltage_detect == 1 ? "Yes" : "No";
   const char* temp_detect_str = remote_temp_detect == 1 ? "Yes" : "No";
