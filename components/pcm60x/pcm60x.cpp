@@ -142,9 +142,14 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
 }
 
 void PCM60XComponent::parse_qpiri_(const std::string &data) {
+  std::string cleaned_data = data;
+  if (!cleaned_data.empty() && cleaned_data[0] == '(') {
+    cleaned_data = cleaned_data.substr(1);
+  }
+
   std::vector<std::string> parts;
   std::string token;
-  std::istringstream stream(data);
+  std::istringstream stream(cleaned_data);
   while (std::getline(stream, token, ' ')) {
     parts.push_back(token);
   }
