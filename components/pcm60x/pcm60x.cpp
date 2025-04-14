@@ -127,7 +127,7 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
 
   ESP_LOGD(TAG, "QPIGS part count: %d", parts.size());
 
-  if (parts.size() < 13) {
+  if (parts.size() < 11) {
     ESP_LOGW(TAG, "QPIGS response too short, got %d parts", parts.size());
     return;
   }
