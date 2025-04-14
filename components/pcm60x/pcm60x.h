@@ -22,6 +22,7 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   uint16_t calculate_crc_(const char *data, size_t length);
   void parse_qpigs_(const std::string &data);
   void parse_qpiri_(const std::string &data);
+  void parse_qpiws_(const std::string &data);
 
   sensor::Sensor *battery_voltage_sensor_{nullptr};
   sensor::Sensor *pv_voltage_sensor_{nullptr};

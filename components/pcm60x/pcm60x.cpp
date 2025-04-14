@@ -31,7 +31,10 @@ void PCM60XComponent::update() {
     } else if (cmd == "QPIRI") {
       this->parse_qpiri_(response);
     }
-
+      else if (cmd == "QPIWS") {
+      this->parse_qpiws_(response);
+    }
+    
   } else {
     ESP_LOGW(TAG, "No response received for %s", cmd.c_str());
   }
@@ -223,6 +226,59 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
   ESP_LOGD(TAG, "Batteries in Series: %.0f", batteries_in_series);
   ESP_LOGD(TAG, "Low Warning Voltage: %.2f V", low_warning_voltage);
   ESP_LOGD(TAG, "Low Shutdown Detect: %s", shutdown_str);
+}
+
+void PCM60XComponent::parse_qpiws_(const std::string &data) {
+  std::string cleaned_data = data;
+  if (!cleaned_data.empty() && cleaned_data[0] == '(') {
+    cleaned_data = cleaned_data.substr(1);
+  }
+
+  if (cleaned_data.size() < 30) {
+    ESP_LOGW(TAG, "QPIWS response too short, expected 30 bits but got %d", cleaned_data.size());
+    return;
+  }
+
+  ESP_LOGD(TAG, "QPIWS decoded warnings/faults:");
+
+  const char* labels[30] = {
+    "Over charge current fault",         // a01
+    "Over temperature fault",            // a02
+    "Battery voltage under fault",       // a03
+    "Battery voltage high fault",        // a04
+    "PV high loss fault",                // a05
+    "Battery temp too low fault",        // a06
+    "Battery temp too high fault",       // a07
+    "Reserved",                          // a08
+    "Reserved",                          // a09
+    "Reserved",                          // a10
+    "Reserved",                          // a11
+    "Reserved",                          // a12
+    "Reserved",                          // a13
+    "Reserved",                          // a14
+    "Reserved",                          // a15
+    "Reserved",                          // a16
+    "Reserved",                          // a17
+    "Reserved",                          // a18
+    "Reserved",                          // a19
+    "PV low loss warning",               // a20
+    "PV high derating warning",          // a21
+    "Temp high derating warning",        // a22
+    "Battery temp low alarm warning",    // a23
+    "Reserved",                          // a24
+    "Reserved",                          // a25
+    "Reserved",                          // a26
+    "Reserved",                          // a27
+    "Reserved",                          // a28
+    "Reserved",                          // a29
+    "Battery low warning (AS400 only)"   // a30
+  };
+
+  for (size_t i = 0; i < 30 && i < cleaned_data.size(); ++i) {
+    char bit = cleaned_data[i];
+    const char* state = (bit == '1') ? "ACTIVE" : "OK";
+    ESP_LOGD(TAG, "Bit %02d: %s - %s", static_cast<int>(i + 1), labels[i], state);
+  }
 }
 
 
