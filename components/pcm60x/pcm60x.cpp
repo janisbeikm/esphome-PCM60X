@@ -156,9 +156,7 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
 
   ESP_LOGD(TAG, "QPIRI Response: %s", data.c_str());
 
-  int max_output_power = std::atoi(parts[0].c_str());
-  if (max_output_power == 0) max_output_power = std::strtol(parts[0].c_str(), nullptr, 10);
-
+  long max_output_power = std::strtol(parts[0].c_str(), nullptr, 10);
   float nominal_battery_voltage = std::strtof(parts[1].c_str(), nullptr);
   float nominal_charging_current = std::strtof(parts[2].c_str(), nullptr);
   float absorption_voltage = std::strtof(parts[3].c_str(), nullptr);
@@ -186,7 +184,7 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
   const char* shutdown_str = low_shutdown_detect == 1 ? "Enabled" : "Disabled";
 
   ESP_LOGD(TAG, "QPIRI decoded:");
-  ESP_LOGD(TAG, "Max Output Power: %d W", max_output_power);
+  ESP_LOGD(TAG, "Max Output Power: %ld W", max_output_power);
   ESP_LOGD(TAG, "Nominal Battery Voltage: %.1f V", nominal_battery_voltage);
   ESP_LOGD(TAG, "Nominal Charging Current: %.1f A", nominal_charging_current);
   ESP_LOGD(TAG, "Absorption Voltage: %.2f V", absorption_voltage);
