@@ -15,7 +15,7 @@ void PCM60XComponent::setup() {
 
 void PCM60XComponent::update() {
   static std::vector<std::string> commands = {
-    "QPI", "QID", "QVFW", "QPIRI", "QPIGS", "QDI", "QPIWS", "QBEQI"
+    "QPIRI", "QPIGS", "QDI", "QPIWS", "QBEQI"
   };
   static size_t cmd_index = 0;
 
