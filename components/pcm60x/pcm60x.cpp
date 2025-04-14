@@ -120,16 +120,35 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
     parts.push_back(token);
   }
 
-  if (parts.size() < 3) {
-    ESP_LOGW(TAG, "QPIGS response too short");
+  if (parts.size() < 13) {
+    ESP_LOGW(TAG, "QPIGS response too short, got %d parts", parts.size());
     return;
   }
 
-  float pv_voltage = 0, battery_voltage = 0, charging_current = 0;
-  char *end;
-  pv_voltage = std::strtof(parts[0].c_str(), &end);
-  battery_voltage = std::strtof(parts[1].c_str(), &end);
-  charging_current = std::strtof(parts[2].c_str(), &end);
+  float pv_voltage = std::strtof(parts[0].c_str(), nullptr);
+  float battery_voltage = std::strtof(parts[1].c_str(), nullptr);
+  float charging_current = std::strtof(parts[2].c_str(), nullptr);
+  float charging_current1 = std::strtof(parts[3].c_str(), nullptr);
+  float charging_current2 = std::strtof(parts[4].c_str(), nullptr);
+  int charging_power = std::atoi(parts[5].c_str());
+  int temperature = std::atoi(parts[6].c_str());
+  float remote_batt_voltage = std::strtof(parts[7].c_str(), nullptr);
+  int remote_batt_temp = std::atoi(parts[8].c_str());
+  std::string reserved = parts[9];
+  std::string status_bits = parts[10];
+
+  ESP_LOGD(TAG, "QPIGS decoded:");
+  ESP_LOGD(TAG, "PV Input Voltage: %.1f V", pv_voltage);
+  ESP_LOGD(TAG, "Battery Voltage: %.2f V", battery_voltage);
+  ESP_LOGD(TAG, "Charging Current: %.2f A", charging_current);
+  ESP_LOGD(TAG, "Charging Current 1: %.2f A", charging_current1);
+  ESP_LOGD(TAG, "Charging Current 2: %.2f A", charging_current2);
+  ESP_LOGD(TAG, "Charging Power: %d W", charging_power);
+  ESP_LOGD(TAG, "Unit Temperature: %d °C", temperature);
+  ESP_LOGD(TAG, "Remote Battery Voltage: %.2f V", remote_batt_voltage);
+  ESP_LOGD(TAG, "Remote Battery Temperature: %d °C", remote_batt_temp);
+  ESP_LOGD(TAG, "Reserved Field: %s", reserved.c_str());
+  ESP_LOGD(TAG, "Status Bits: %s", status_bits.c_str());
 
   if (this->pv_voltage_sensor_ != nullptr)
     this->pv_voltage_sensor_->publish_state(pv_voltage);
@@ -137,8 +156,6 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
     this->battery_voltage_sensor_->publish_state(battery_voltage);
   if (this->charging_current_sensor_ != nullptr)
     this->charging_current_sensor_->publish_state(charging_current);
-
-  ESP_LOGD(TAG, "QPIGS: PV=%.1fV, Bat=%.2fV, Current=%.2fA", pv_voltage, battery_voltage, charging_current);
 }
 
 void PCM60XComponent::parse_qpiri_(const std::string &data) {
