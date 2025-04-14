@@ -156,40 +156,47 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
 
   ESP_LOGD(TAG, "QPIRI Response: %s", data.c_str());
 
-  float max_output_power = std::strtof(parts[0].c_str(), nullptr);
+  int max_output_power = std::atoi(parts[0].c_str());
   float nominal_battery_voltage = std::strtof(parts[1].c_str(), nullptr);
   float nominal_charging_current = std::strtof(parts[2].c_str(), nullptr);
   float absorption_voltage = std::strtof(parts[3].c_str(), nullptr);
   float float_voltage = std::strtof(parts[4].c_str(), nullptr);
-
-  std::string battery_type = (parts[5] == "0") ? "AGM" :
-                             (parts[5] == "1") ? "Flooded" :
-                             (parts[5] == "2") ? "User" : "Unknown";
-  std::string remote_batt_voltage_detect = (parts[6] == "1") ? "Yes" : "No";
+  int battery_type = std::atoi(parts[5].c_str());
+  int remote_battery_voltage_detect = std::atoi(parts[6].c_str());
   float temp_compensation = std::strtof(parts[7].c_str(), nullptr);
-  std::string remote_temp_detect = (parts[8] == "1") ? "Yes" : "No";
-  std::string battery_rated_voltage_set = (parts[9] == "0") ? "12V" :
-                                          (parts[9] == "1") ? "24V" :
-                                          (parts[9] == "2") ? "36V" :
-                                          (parts[9] == "3") ? "48V" : "Unknown";
+  int remote_temp_detect = std::atoi(parts[8].c_str());
+  int battery_rated_voltage_set = std::atoi(parts[9].c_str());
   float batteries_in_series = std::strtof(parts[10].c_str(), nullptr);
   float low_warning_voltage = std::strtof(parts[11].c_str(), nullptr);
-  std::string low_shutdown_detect = (parts[12] == "1") ? "Enabled" : "Disabled";
+  int low_shutdown_detect = std::atoi(parts[12].c_str());
+
+  const char* battery_type_str = battery_type == 0 ? "AGM" :
+                                 battery_type == 1 ? "Flooded" :
+                                 battery_type == 2 ? "User" : "Unknown";
+
+  const char* remote_batt_str = remote_battery_voltage_detect == 1 ? "Yes" : "No";
+  const char* temp_detect_str = remote_temp_detect == 1 ? "Yes" : "No";
+
+  const char* rated_voltage_str = battery_rated_voltage_set == 48 ? "48V" :
+                                  battery_rated_voltage_set == 24 ? "24V" :
+                                  battery_rated_voltage_set == 12 ? "12V" : "Unknown";
+
+  const char* shutdown_str = low_shutdown_detect == 1 ? "Enabled" : "Disabled";
 
   ESP_LOGD(TAG, "QPIRI decoded:");
-  ESP_LOGD(TAG, "Max Output Power: %.0f W", max_output_power);
+  ESP_LOGD(TAG, "Max Output Power: %d W", max_output_power);
   ESP_LOGD(TAG, "Nominal Battery Voltage: %.1f V", nominal_battery_voltage);
   ESP_LOGD(TAG, "Nominal Charging Current: %.1f A", nominal_charging_current);
   ESP_LOGD(TAG, "Absorption Voltage: %.2f V", absorption_voltage);
   ESP_LOGD(TAG, "Float Voltage: %.2f V", float_voltage);
-  ESP_LOGD(TAG, "Battery Type: %s", battery_type.c_str());
-  ESP_LOGD(TAG, "Remote Batt Voltage Detect: %s", remote_batt_voltage_detect.c_str());
+  ESP_LOGD(TAG, "Battery Type: %s", battery_type_str);
+  ESP_LOGD(TAG, "Remote Batt Voltage Detect: %s", remote_batt_str);
   ESP_LOGD(TAG, "Temp Compensation: %.1f mV/unit/°C", temp_compensation);
-  ESP_LOGD(TAG, "Remote Temp Detect: %s", remote_temp_detect.c_str());
-  ESP_LOGD(TAG, "Battery Rated V Set: %s", battery_rated_voltage_set.c_str());
+  ESP_LOGD(TAG, "Remote Temp Detect: %s", temp_detect_str);
+  ESP_LOGD(TAG, "Battery Rated V Set: %s", rated_voltage_str);
   ESP_LOGD(TAG, "Batteries in Series: %.0f", batteries_in_series);
   ESP_LOGD(TAG, "Low Warning Voltage: %.2f V", low_warning_voltage);
-  ESP_LOGD(TAG, "Low Shutdown Detect: %s", low_shutdown_detect.c_str());
+  ESP_LOGD(TAG, "Low Shutdown Detect: %s", shutdown_str);
 }
 
 }  // namespace pcm60x
