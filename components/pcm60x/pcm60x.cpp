@@ -141,8 +141,6 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
   int temperature = std::atoi(parts[6].c_str());
   float remote_batt_voltage = std::strtof(parts[7].c_str(), nullptr);
   int remote_batt_temp = std::atoi(parts[8].c_str());
-  std::string reserved = parts[9];
-  std::string status_bits = parts[10];
 
   ESP_LOGD(TAG, "QPIGS decoded:");
   ESP_LOGD(TAG, "PV Input Voltage: %.1f V", pv_voltage);
@@ -154,8 +152,6 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
   ESP_LOGD(TAG, "Unit Temperature: %d °C", temperature);
   ESP_LOGD(TAG, "Remote Battery Voltage: %.2f V", remote_batt_voltage);
   ESP_LOGD(TAG, "Remote Battery Temperature: %d °C", remote_batt_temp);
-  ESP_LOGD(TAG, "Reserved Field: %s", reserved.c_str());
-  ESP_LOGD(TAG, "Status Bits: %s", status_bits.c_str());
 
   if (this->pv_voltage_sensor_ != nullptr)
     this->pv_voltage_sensor_->publish_state(pv_voltage);
