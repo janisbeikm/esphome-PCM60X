@@ -15,7 +15,7 @@ void PCM60XComponent::setup() {
 
 void PCM60XComponent::update() {
   static std::vector<std::string> commands = {
-    "QPIRI", "QPIGS", "QDI", "QPIWS", "QBEQI"
+    "QPIRI", "QPIGS", "QPIWS", "QBEQI"
   };
   static size_t cmd_index = 0;
 
@@ -31,9 +31,7 @@ void PCM60XComponent::update() {
     } else if (cmd == "QPIRI") {
       this->parse_qpiri_(response);
     }
-      else if (cmd == "QDI") {
-      this->parse_qdi_(response);
-    }
+
   } else {
     ESP_LOGW(TAG, "No response received for %s", cmd.c_str());
   }
@@ -227,48 +225,6 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
   ESP_LOGD(TAG, "Low Shutdown Detect: %s", shutdown_str);
 }
 
-void PCM60XComponent::parse_qdi_(const std::string &data) {
-  std::string cleaned = data;
-  if (!cleaned.empty() && cleaned[0] == '(') cleaned = cleaned.substr(1);
 
-  std::vector<std::string> parts;
-  std::istringstream stream(cleaned);
-  std::string token;
-  while (std::getline(stream, token, ' ')) parts.push_back(token);
-
-  ESP_LOGD(TAG, "QDI part count: %d", parts.size());
-
-  if (parts.size() < 8) {
-    ESP_LOGW(TAG, "QDI response too short, got %d parts", parts.size());
-    return;
-  }
-
-  const char *battery_voltage_set_str = "Unknown";
-  if (parts[0] == "00") battery_voltage_set_str = "Auto";
-  else if (parts[0] == "01") battery_voltage_set_str = "12V";
-  else if (parts[0] == "02") battery_voltage_set_str = "24V";
-  else if (parts[0] == "03") battery_voltage_set_str = "36V";
-  else if (parts[0] == "04") battery_voltage_set_str = "48V";
-
-  const char *battery_type_str = "Unknown";
-  if (parts[2] == "00") battery_type_str = "AGM";
-  else if (parts[2] == "01") battery_type_str = "Flooded";
-  else if (parts[2] == "02") battery_type_str = "User";
-
-  int max_charging_current = std::atoi(parts[1].c_str());
-  float absorption_voltage = std::strtof(parts[3].c_str(), nullptr);
-  float float_voltage = std::strtof(parts[4].c_str(), nullptr);
-  const char *remote_voltage_detect_str = (parts[5] == "01") ? "No" : "Yes";
-  float temp_comp = std::strtof(parts[6].c_str(), nullptr);
-
-  ESP_LOGD(TAG, "QDI decoded:");
-  ESP_LOGD(TAG, "Battery Voltage Set: %s", battery_voltage_set_str);
-  ESP_LOGD(TAG, "Max Charging Current: %d A", max_charging_current);
-  ESP_LOGD(TAG, "Battery Type: %s", battery_type_str);
-  ESP_LOGD(TAG, "Absorption Voltage: %.2f V", absorption_voltage);
-  ESP_LOGD(TAG, "Float Voltage: %.2f V", float_voltage);
-  ESP_LOGD(TAG, "Remote Batt Voltage Detect: %s", remote_voltage_detect_str);
-  ESP_LOGD(TAG, "BTS Temp Compensation: %.1f mV/°C", temp_comp);
-}
 }  // namespace pcm60x
 }  // namespace esphome
