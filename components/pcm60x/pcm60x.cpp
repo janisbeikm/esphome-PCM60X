@@ -240,7 +240,7 @@ void PCM60XComponent::parse_qdi_(const std::string &data) {
     parts.push_back(token);
   }
   ESP_LOGD(TAG, "QDI part count: %d", parts.size());
-  if (parts.size() < 9) {
+  if (parts.size() < 8) {
     ESP_LOGW(TAG, "QDI response too short, got %d parts", parts.size());
     return;
   }
