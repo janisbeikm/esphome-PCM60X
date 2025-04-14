@@ -182,9 +182,9 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
   const char* remote_batt_str = remote_battery_voltage_detect == 1 ? "Yes" : "No";
   const char* temp_detect_str = remote_temp_detect == 1 ? "Yes" : "No";
 
-  const char* rated_voltage_str = battery_rated_voltage_set == 48 ? "48V" :
-                                  battery_rated_voltage_set == 24 ? "24V" :
-                                  battery_rated_voltage_set == 12 ? "12V" : "Unknown";
+  const char* rated_voltage_str = battery_rated_voltage_set == 4 ? "48V" :
+                                  battery_rated_voltage_set == 2 ? "24V" :
+                                  battery_rated_voltage_set == 1 ? "12V" : "Unknown";
 
   const char* shutdown_str = low_shutdown_detect == 1 ? "Enabled" : "Disabled";
 
