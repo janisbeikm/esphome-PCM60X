@@ -15,6 +15,13 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   void set_battery_voltage_sensor(sensor::Sensor *sensor) { battery_voltage_sensor_ = sensor; }
   void set_pv_voltage_sensor(sensor::Sensor *sensor) { pv_voltage_sensor_ = sensor; }
   void set_charging_current_sensor(sensor::Sensor *sensor) { charging_current_sensor_ = sensor; }
+  void set_charging_current_1_sensor(sensor::Sensor *s) { charging_current_1_sensor_ = s; }
+  void set_charging_current_2_sensor(sensor::Sensor *s) { charging_current_2_sensor_ = s; }
+  void set_charging_power_sensor(sensor::Sensor *s) { charging_power_sensor_ = s; }
+  void set_unit_temperature_sensor(sensor::Sensor *s) { unit_temperature_sensor_ = s; }
+  void set_remote_battery_voltage_sensor(sensor::Sensor *s) { remote_battery_voltage_sensor_ = s; }
+  void set_remote_battery_temperature_sensor(sensor::Sensor *s) { remote_battery_temperature_sensor_ = s; }
+
 
  protected:
   void send_command_(const std::string &command);
@@ -28,6 +35,13 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   sensor::Sensor *battery_voltage_sensor_{nullptr};
   sensor::Sensor *pv_voltage_sensor_{nullptr};
   sensor::Sensor *charging_current_sensor_{nullptr};
+  sensor::Sensor *charging_current_1_sensor_{nullptr};
+  sensor::Sensor *charging_current_2_sensor_{nullptr};
+  sensor::Sensor *charging_power_sensor_{nullptr};
+  sensor::Sensor *unit_temperature_sensor_{nullptr};
+  sensor::Sensor *remote_battery_voltage_sensor_{nullptr};
+  sensor::Sensor *remote_battery_temperature_sensor_{nullptr};
+
 };
 
 }  // namespace pcm60x
