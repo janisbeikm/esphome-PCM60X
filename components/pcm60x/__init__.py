@@ -12,6 +12,12 @@ PCM60XComponent = pcm60x_ns.class_("PCM60XComponent", cg.PollingComponent, uart.
 CONF_PV_VOLTAGE = "pv_voltage"
 CONF_BATTERY_VOLTAGE = "battery_voltage"
 CONF_CHARGING_CURRENT = "charging_current"
+CONF_CHARGING_CURRENT1 = "charging_current_1"
+CONF_CHARGING_CURRENT2 = "charging_current_2"
+CONF_CHARGING_POWER = "charging_power"
+CONF_UNIT_TEMPERATURE = "unit_temperature"
+CONF_REMOTE_BATTERY_VOLTAGE = "remote_battery_voltage"
+CONF_REMOTE_BATTERY_TEMPERATURE = "remote_battery_temperature"
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(PCM60XComponent),
@@ -31,6 +37,36 @@ CONFIG_SCHEMA = cv.Schema({
         unit_of_measurement=UNIT_AMPERE,
         accuracy_decimals=2,
         icon="mdi:current-dc",
+    ),
+        cv.Optional(CONF_CHARGING_CURRENT1): sensor.sensor_schema(
+        unit_of_measurement=UNIT_AMPERE,
+        accuracy_decimals=2,
+        icon="mdi:current-dc",
+    ),
+    cv.Optional(CONF_CHARGING_CURRENT2): sensor.sensor_schema(
+        unit_of_measurement=UNIT_AMPERE,
+        accuracy_decimals=2,
+        icon="mdi:current-dc",
+    ),
+    cv.Optional(CONF_CHARGING_POWER): sensor.sensor_schema(
+        unit_of_measurement="W",
+        accuracy_decimals=0,
+        icon="mdi:flash",
+    ),
+    cv.Optional(CONF_UNIT_TEMPERATURE): sensor.sensor_schema(
+        unit_of_measurement="°C",
+        accuracy_decimals=0,
+        icon="mdi:thermometer",
+    ),
+    cv.Optional(CONF_REMOTE_BATTERY_VOLTAGE): sensor.sensor_schema(
+        unit_of_measurement=UNIT_VOLT,
+        accuracy_decimals=2,
+        icon="mdi:car-battery",
+    ),
+    cv.Optional(CONF_REMOTE_BATTERY_TEMPERATURE): sensor.sensor_schema(
+        unit_of_measurement="°C",
+        accuracy_decimals=0,
+        icon="mdi:thermometer",
     ),
 }).extend(cv.polling_component_schema("10s")).extend(uart.UART_DEVICE_SCHEMA)
 
