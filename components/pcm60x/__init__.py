@@ -86,3 +86,26 @@ async def to_code(config):
     if CONF_CHARGING_CURRENT in config:
         sens = await sensor.new_sensor(config[CONF_CHARGING_CURRENT])
         cg.add(var.set_charging_current_sensor(sens))
+    if CONF_CHARGING_CURRENT1 in config:
+        sens = await sensor.new_sensor(config[CONF_CHARGING_CURRENT1])
+        cg.add(var.set_charging_current_1_sensor(sens))
+
+    if CONF_CHARGING_CURRENT2 in config:
+        sens = await sensor.new_sensor(config[CONF_CHARGING_CURRENT2])
+        cg.add(var.set_charging_current_2_sensor(sens))
+
+    if CONF_CHARGING_POWER in config:
+        sens = await sensor.new_sensor(config[CONF_CHARGING_POWER])
+        cg.add(var.set_charging_power_sensor(sens))
+
+    if CONF_UNIT_TEMPERATURE in config:
+        sens = await sensor.new_sensor(config[CONF_UNIT_TEMPERATURE])
+        cg.add(var.set_unit_temperature_sensor(sens))
+
+    if CONF_REMOTE_BATTERY_VOLTAGE in config:
+        sens = await sensor.new_sensor(config[CONF_REMOTE_BATTERY_VOLTAGE])
+        cg.add(var.set_remote_battery_voltage_sensor(sens))
+
+    if CONF_REMOTE_BATTERY_TEMPERATURE in config:
+        sens = await sensor.new_sensor(config[CONF_REMOTE_BATTERY_TEMPERATURE])
+        cg.add(var.set_remote_battery_temperature_sensor(sens))
