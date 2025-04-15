@@ -166,6 +166,19 @@ void PCM60XComponent::parse_qpigs_(const std::string &data) {
     this->battery_voltage_sensor_->publish_state(battery_voltage);
   if (this->charging_current_sensor_ != nullptr)
     this->charging_current_sensor_->publish_state(charging_current);
+  if (this->charging_current_1_sensor_ != nullptr)
+    this->charging_current_1_sensor_->publish_state(charging_current1);
+  if (this->charging_current_2_sensor_ != nullptr)
+    this->charging_current_2_sensor_->publish_state(charging_current2);
+  if (this->charging_power_sensor_ != nullptr)
+    this->charging_power_sensor_->publish_state(charging_power);
+  if (this->unit_temperature_sensor_ != nullptr)
+    this->unit_temperature_sensor_->publish_state(temperature);
+  if (this->remote_battery_voltage_sensor_ != nullptr)
+    this->remote_battery_voltage_sensor_->publish_state(remote_batt_voltage);
+  if (this->remote_battery_temperature_sensor_ != nullptr)
+    this->remote_battery_temperature_sensor_->publish_state(remote_batt_temp);
+
 }
 
 void PCM60XComponent::parse_qpiri_(const std::string &data) {
