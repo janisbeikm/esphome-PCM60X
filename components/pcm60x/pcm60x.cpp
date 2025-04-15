@@ -259,7 +259,17 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
     this->batteries_in_series_sensor_->publish_state(batteries_in_series);
   if (this->low_warning_voltage_sensor_ != nullptr)
     this->low_warning_voltage_sensor_->publish_state(low_warning_voltage);
-
+  if (this->battery_type_text_ != nullptr)
+    this->battery_type_text_->publish_state(battery_type_str);
+  if (this->remote_batt_voltage_detect_text_ != nullptr)
+    this->remote_batt_voltage_detect_text_->publish_state(remote_batt_str);
+  if (this->remote_temp_detect_text_ != nullptr)
+    this->remote_temp_detect_text_->publish_state(temp_detect_str);
+  if (this->battery_rated_voltage_text_ != nullptr)
+    this->battery_rated_voltage_text_->publish_state(rated_voltage_str);
+  if (this->low_shutdown_detect_text_ != nullptr)
+    this->low_shutdown_detect_text_->publish_state(shutdown_str);
+  
 }
 
 void PCM60XComponent::parse_qpiws_(const std::string &data) {

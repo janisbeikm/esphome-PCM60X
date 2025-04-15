@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import uart, sensor
+from esphome.components import uart, sensor, text_sensor
 from esphome.const import (
     CONF_ID,
     DEVICE_CLASS_VOLTAGE,
@@ -36,6 +36,12 @@ CONF_FLOAT_VOLTAGE = "float_voltage"
 CONF_TEMP_COMPENSATION = "temp_compensation"
 CONF_BATTERIES_IN_SERIES = "batteries_in_series"
 CONF_LOW_WARNING_VOLTAGE = "low_warning_voltage"
+CONF_BATTERY_TYPE = "battery_type"
+CONF_REMOTE_BATT_VOLTAGE_DETECT = "remote_batt_voltage_detect"
+CONF_REMOTE_TEMP_DETECT = "remote_temp_detect"
+CONF_BATTERY_RATED_VOLTAGE = "battery_rated_voltage"
+CONF_LOW_SHUTDOWN_DETECT = "low_shutdown_detect"
+
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(PCM60XComponent),
@@ -133,8 +139,12 @@ CONFIG_SCHEMA = cv.Schema({
         unit_of_measurement=UNIT_VOLT,
         accuracy_decimals=2,
         device_class=DEVICE_CLASS_VOLTAGE,
-    ),
-
+    ), 
+    cv.Optional(CONF_BATTERY_TYPE): text_sensor.text_sensor_schema(icon="mdi:battery"),
+    cv.Optional(CONF_REMOTE_BATT_VOLTAGE_DETECT): text_sensor.text_sensor_schema(icon="mdi:battery-bluetooth"),
+    cv.Optional(CONF_REMOTE_TEMP_DETECT): text_sensor.text_sensor_schema(icon="mdi:thermometer"),
+    cv.Optional(CONF_BATTERY_RATED_VOLTAGE): text_sensor.text_sensor_schema(icon="mdi:battery-settings"),
+    cv.Optional(CONF_LOW_SHUTDOWN_DETECT): text_sensor.text_sensor_schema(icon="mdi:power-settings"),
 }).extend(cv.polling_component_schema("10s")).extend(uart.UART_DEVICE_SCHEMA)
 
 async def to_code(config):
@@ -208,4 +218,23 @@ async def to_code(config):
     if CONF_LOW_WARNING_VOLTAGE in config:
         sens = await sensor.new_sensor(config[CONF_LOW_WARNING_VOLTAGE])
         cg.add(var.set_low_warning_voltage_sensor(sens))
+    if CONF_BATTERY_TYPE in config:
+        sens = await text_sensor.new_text_sensor(config[CONF_BATTERY_TYPE])
+        cg.add(var.set_battery_type_text_sensor(sens))
+
+    if CONF_REMOTE_BATT_VOLTAGE_DETECT in config:
+        sens = await text_sensor.new_text_sensor(config[CONF_REMOTE_BATT_VOLTAGE_DETECT])
+        cg.add(var.set_remote_batt_voltage_detect_text_sensor(sens))
+
+    if CONF_REMOTE_TEMP_DETECT in config:
+        sens = await text_sensor.new_text_sensor(config[CONF_REMOTE_TEMP_DETECT])
+        cg.add(var.set_remote_temp_detect_text_sensor(sens))
+
+    if CONF_BATTERY_RATED_VOLTAGE in config:
+        sens = await text_sensor.new_text_sensor(config[CONF_BATTERY_RATED_VOLTAGE])
+        cg.add(var.set_battery_rated_voltage_text_sensor(sens))
+
+    if CONF_LOW_SHUTDOWN_DETECT in config:
+        sens = await text_sensor.new_text_sensor(config[CONF_LOW_SHUTDOWN_DETECT])
+        cg.add(var.set_low_shutdown_detect_text_sensor(sens))
 
