@@ -34,7 +34,10 @@ void PCM60XComponent::update() {
       else if (cmd == "QPIWS") {
       this->parse_qpiws_(response);
     }
-    
+      else if (cmd == "QBEQI") {
+      this->parse_qbeqi_(response);
+    }
+
   } else {
     ESP_LOGW(TAG, "No response received for %s", cmd.c_str());
   }
@@ -279,6 +282,44 @@ void PCM60XComponent::parse_qpiws_(const std::string &data) {
     const char* state = (bit == '1') ? "ACTIVE" : "OK";
     ESP_LOGD(TAG, "Bit %02d: %s - %s", static_cast<int>(i + 1), labels[i], state);
   }
+}
+
+void PCM60XComponent::parse_qbeqi_(const std::string &data) {
+  std::string cleaned_data = data;
+  if (!cleaned_data.empty() && cleaned_data[0] == '(') {
+    cleaned_data = cleaned_data.substr(1);
+  }
+
+  std::vector<std::string> parts;
+  std::string token;
+  std::istringstream stream(cleaned_data);
+  while (std::getline(stream, token, ' ')) {
+    parts.push_back(token);
+  }
+
+  if (parts.size() < 8) {
+    ESP_LOGW(TAG, "QBEQI response too short, got %d parts", parts.size());
+    return;
+  }
+
+  int eq_enabled = std::atoi(parts[0].c_str());  // 0 = Enabled, 1 = Disabled
+  int eq_time_min = std::atoi(parts[1].c_str());
+  int eq_interval_days = std::atoi(parts[2].c_str());
+  int max_eq_current = std::atoi(parts[3].c_str());
+  int next_eq_days = std::atoi(parts[4].c_str());
+  float eq_voltage = std::strtof(parts[5].c_str(), nullptr);
+  int cv_charge_time = std::atoi(parts[6].c_str());
+  int eq_timeout = std::atoi(parts[7].c_str());
+
+  ESP_LOGD(TAG, "QBEQI decoded:");
+  ESP_LOGD(TAG, "Equalization Enabled: %s", eq_enabled == 0 ? "Yes" : "No");
+  ESP_LOGD(TAG, "Equalization Time: %d min", eq_time_min);
+  ESP_LOGD(TAG, "Equalization Interval: %d days", eq_interval_days);
+  ESP_LOGD(TAG, "Max Equalization Current: %d A", max_eq_current);
+  ESP_LOGD(TAG, "Time Until Next Equalization: %d days", next_eq_days);
+  ESP_LOGD(TAG, "Equalization Voltage: %.2f V", eq_voltage);
+  ESP_LOGD(TAG, "C.V. Charge Time: %d min", cv_charge_time);
+  ESP_LOGD(TAG, "Equalization Timeout: %d min", eq_timeout);
 }
 
 
