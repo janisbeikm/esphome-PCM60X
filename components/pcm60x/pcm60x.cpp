@@ -312,7 +312,7 @@ void PCM60XComponent::parse_qbeqi_(const std::string &data) {
   int eq_timeout = std::atoi(parts[7].c_str());
 
   ESP_LOGD(TAG, "QBEQI decoded:");
-  ESP_LOGD(TAG, "Equalization Enabled: %s", eq_enabled == 0 ? "Yes" : "No");
+  ESP_LOGD(TAG, "Equalization Enabled: %s", eq_enabled == 1 ? "Yes" : "No");
   ESP_LOGD(TAG, "Equalization Time: %d min", eq_time_min);
   ESP_LOGD(TAG, "Equalization Interval: %d days", eq_interval_days);
   ESP_LOGD(TAG, "Max Equalization Current: %d A", max_eq_current);
