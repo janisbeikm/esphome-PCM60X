@@ -21,6 +21,15 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   void set_unit_temperature_sensor(sensor::Sensor *s) { unit_temperature_sensor_ = s; }
   void set_remote_battery_voltage_sensor(sensor::Sensor *s) { remote_battery_voltage_sensor_ = s; }
   void set_remote_battery_temperature_sensor(sensor::Sensor *s) { remote_battery_temperature_sensor_ = s; }
+  void set_max_output_power_sensor(sensor::Sensor *s) { max_output_power_sensor_ = s; }
+  void set_nominal_battery_voltage_sensor(sensor::Sensor *s) { nominal_battery_voltage_sensor_ = s; }
+  void set_nominal_charging_current_sensor(sensor::Sensor *s) { nominal_charging_current_sensor_ = s; }
+  void set_absorption_voltage_sensor(sensor::Sensor *s) { absorption_voltage_sensor_ = s; }
+  void set_float_voltage_sensor(sensor::Sensor *s) { float_voltage_sensor_ = s; }
+  void set_temp_compensation_sensor(sensor::Sensor *s) { temp_compensation_sensor_ = s; }
+  void set_batteries_in_series_sensor(sensor::Sensor *s) { batteries_in_series_sensor_ = s; }
+  void set_low_warning_voltage_sensor(sensor::Sensor *s) { low_warning_voltage_sensor_ = s; }
+
 
 
  protected:
@@ -41,6 +50,15 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   sensor::Sensor *unit_temperature_sensor_{nullptr};
   sensor::Sensor *remote_battery_voltage_sensor_{nullptr};
   sensor::Sensor *remote_battery_temperature_sensor_{nullptr};
+  sensor::Sensor *max_output_power_sensor_{nullptr};
+  sensor::Sensor *nominal_battery_voltage_sensor_{nullptr};
+  sensor::Sensor *nominal_charging_current_sensor_{nullptr};
+  sensor::Sensor *absorption_voltage_sensor_{nullptr};
+  sensor::Sensor *float_voltage_sensor_{nullptr};
+  sensor::Sensor *temp_compensation_sensor_{nullptr};
+  sensor::Sensor *batteries_in_series_sensor_{nullptr};
+  sensor::Sensor *low_warning_voltage_sensor_{nullptr};
+
 
 };
 

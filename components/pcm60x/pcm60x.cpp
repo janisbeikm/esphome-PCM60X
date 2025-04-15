@@ -242,6 +242,24 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
   ESP_LOGD(TAG, "Batteries in Series: %.0f", batteries_in_series);
   ESP_LOGD(TAG, "Low Warning Voltage: %.2f V", low_warning_voltage);
   ESP_LOGD(TAG, "Low Shutdown Detect: %s", shutdown_str);
+
+  if (this->max_output_power_sensor_ != nullptr)
+    this->max_output_power_sensor_->publish_state(max_output_power);
+  if (this->nominal_battery_voltage_sensor_ != nullptr)
+    this->nominal_battery_voltage_sensor_->publish_state(nominal_battery_voltage);
+  if (this->nominal_charging_current_sensor_ != nullptr)
+    this->nominal_charging_current_sensor_->publish_state(nominal_charging_current);
+  if (this->absorption_voltage_sensor_ != nullptr)
+    this->absorption_voltage_sensor_->publish_state(absorption_voltage);
+  if (this->float_voltage_sensor_ != nullptr)
+    this->float_voltage_sensor_->publish_state(float_voltage);
+  if (this->temp_compensation_sensor_ != nullptr)
+    this->temp_compensation_sensor_->publish_state(temp_compensation);
+  if (this->batteries_in_series_sensor_ != nullptr)
+    this->batteries_in_series_sensor_->publish_state(batteries_in_series);
+  if (this->low_warning_voltage_sensor_ != nullptr)
+    this->low_warning_voltage_sensor_->publish_state(low_warning_voltage);
+
 }
 
 void PCM60XComponent::parse_qpiws_(const std::string &data) {
