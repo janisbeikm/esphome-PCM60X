@@ -178,34 +178,34 @@ async def to_code(config):
         cg.add(var.set_remote_battery_temperature_sensor(sens))
 
     if CONF_MAX_OUTPUT_POWER in config:
-        sens = yield sensor.new_sensor(config[CONF_MAX_OUTPUT_POWER])
+        sens = await sensor.new_sensor(config[CONF_MAX_OUTPUT_POWER])
         cg.add(var.set_max_output_power_sensor(sens))
 
     if CONF_NOMINAL_BATTERY_VOLTAGE in config:
-        sens = yield sensor.new_sensor(config[CONF_NOMINAL_BATTERY_VOLTAGE])
+        sens = await sensor.new_sensor(config[CONF_NOMINAL_BATTERY_VOLTAGE])
         cg.add(var.set_nominal_battery_voltage_sensor(sens))
 
     if CONF_NOMINAL_CHARGING_CURRENT in config:
-        sens = yield sensor.new_sensor(config[CONF_NOMINAL_CHARGING_CURRENT])
+        sens = await sensor.new_sensor(config[CONF_NOMINAL_CHARGING_CURRENT])
         cg.add(var.set_nominal_charging_current_sensor(sens))
 
     if CONF_ABSORPTION_VOLTAGE in config:
-        sens = yield sensor.new_sensor(config[CONF_ABSORPTION_VOLTAGE])
+        sens = await sensor.new_sensor(config[CONF_ABSORPTION_VOLTAGE])
         cg.add(var.set_absorption_voltage_sensor(sens))
 
     if CONF_FLOAT_VOLTAGE in config:
-        sens = yield sensor.new_sensor(config[CONF_FLOAT_VOLTAGE])
+        sens = await sensor.new_sensor(config[CONF_FLOAT_VOLTAGE])
         cg.add(var.set_float_voltage_sensor(sens))
 
     if CONF_TEMP_COMPENSATION in config:
-        sens = yield sensor.new_sensor(config[CONF_TEMP_COMPENSATION])
+        sens = await sensor.new_sensor(config[CONF_TEMP_COMPENSATION])
         cg.add(var.set_temp_compensation_sensor(sens))
 
     if CONF_BATTERIES_IN_SERIES in config:
-        sens = yield sensor.new_sensor(config[CONF_BATTERIES_IN_SERIES])
+        sens = await sensor.new_sensor(config[CONF_BATTERIES_IN_SERIES])
         cg.add(var.set_batteries_in_series_sensor(sens))
 
     if CONF_LOW_WARNING_VOLTAGE in config:
-        sens = yield sensor.new_sensor(config[CONF_LOW_WARNING_VOLTAGE])
+        sens = await sensor.new_sensor(config[CONF_LOW_WARNING_VOLTAGE])
         cg.add(var.set_low_warning_voltage_sensor(sens))
 
