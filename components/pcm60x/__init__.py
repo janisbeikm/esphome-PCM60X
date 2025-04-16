@@ -239,10 +239,5 @@ async def to_code(config):
         sens = await text_sensor.new_text_sensor(config[CONF_LOW_SHUTDOWN_DETECT])
         cg.add(var.set_low_shutdown_detect_text_sensor(sens))
         
-    if CONF_WARNING_STATUS_BITS in config:
-        for i, conf in enumerate(config[CONF_WARNING_STATUS_BITS]):
-            var_warning = cg.new_Pvariable(conf[CONF_ID])
-            await cg.register_binary_sensor(var_warning, conf)
-            cg.add(var.warning_status_bits_[i] = var_warning)
 
 
