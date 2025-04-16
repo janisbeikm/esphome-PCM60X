@@ -4,6 +4,7 @@
 #include "esphome/components/uart/uart.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/text_sensor/text_sensor.h"
+#include "esphome/components/binary_sensor/binary_sensor.h"
 
 namespace esphome {
 namespace pcm60x {
@@ -67,7 +68,7 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   text_sensor::TextSensor *remote_temp_detect_text_{nullptr};
   text_sensor::TextSensor *battery_rated_voltage_text_{nullptr};
   text_sensor::TextSensor *low_shutdown_detect_text_{nullptr};
-
+  binary_sensor::BinarySensor *warning_status_bits_[32]{};
 
 
 };
