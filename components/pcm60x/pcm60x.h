@@ -68,7 +68,6 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   text_sensor::TextSensor *remote_temp_detect_text_{nullptr};
   text_sensor::TextSensor *battery_rated_voltage_text_{nullptr};
   text_sensor::TextSensor *low_shutdown_detect_text_{nullptr};
-  binary_sensor::BinarySensor *warning_status_bits_[32]{};
 
 
 };
