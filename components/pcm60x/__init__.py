@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import uart, sensor, text_sensor
+from esphome.components import uart, sensor, text_sensor, binary_sensor
 from esphome.const import (
     CONF_ID,
     DEVICE_CLASS_VOLTAGE,
@@ -41,6 +41,7 @@ CONF_REMOTE_BATT_VOLTAGE_DETECT = "remote_batt_voltage_detect"
 CONF_REMOTE_TEMP_DETECT = "remote_temp_detect"
 CONF_BATTERY_RATED_VOLTAGE = "battery_rated_voltage"
 CONF_LOW_SHUTDOWN_DETECT = "low_shutdown_detect"
+CONF_WARNING_STATUS_BITS = "warning_status_bits"
 
 
 CONFIG_SCHEMA = cv.Schema({
@@ -145,6 +146,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_REMOTE_TEMP_DETECT): text_sensor.text_sensor_schema(icon="mdi:thermometer"),
     cv.Optional(CONF_BATTERY_RATED_VOLTAGE): text_sensor.text_sensor_schema(icon="mdi:battery-settings"),
     cv.Optional(CONF_LOW_SHUTDOWN_DETECT): text_sensor.text_sensor_schema(icon="mdi:power-settings"),
+    cv.Optional(CONF_WARNING_STATUS_BITS): cv.ensure_list(binary_sensor.binary_sensor_schema()),
 }).extend(cv.polling_component_schema("10s")).extend(uart.UART_DEVICE_SCHEMA)
 
 async def to_code(config):
@@ -237,4 +239,8 @@ async def to_code(config):
     if CONF_LOW_SHUTDOWN_DETECT in config:
         sens = await text_sensor.new_text_sensor(config[CONF_LOW_SHUTDOWN_DETECT])
         cg.add(var.set_low_shutdown_detect_text_sensor(sens))
-
+    if CONF_WARNING_STATUS_BITS in config:
+        for i, conf in enumerate(config[CONF_WARNING_STATUS_BITS]):
+            var_warning = cg.new_Pvariable(conf[CONF_ID])
+            await cg.register_binary_sensor(var_warning, conf)
+            cg.add(var.warning_status_bits_[i] = var_warning)
