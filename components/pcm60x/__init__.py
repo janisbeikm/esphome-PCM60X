@@ -15,7 +15,7 @@ from esphome.const import (
 )
 
 CODEOWNERS = ["@janisbeikm"]
-DEPENDENCIES = ["uart", "sensor"]
+DEPENDENCIES = ["uart", "sensor", "text_sensor", "binary_sensor"]
 
 pcm60x_ns = cg.esphome_ns.namespace("pcm60x")
 PCM60XComponent = pcm60x_ns.class_("PCM60XComponent", cg.PollingComponent, uart.UARTDevice)
