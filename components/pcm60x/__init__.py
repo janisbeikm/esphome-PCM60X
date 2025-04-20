@@ -15,7 +15,7 @@ from esphome.const import (
 )
 
 CODEOWNERS = ["@janisbeikm"]
-DEPENDENCIES = ["uart", "sensor", "text_sensor", "binary_sensor"]
+DEPENDENCIES = ["uart", "sensor"]
 
 pcm60x_ns = cg.esphome_ns.namespace("pcm60x")
 PCM60XComponent = pcm60x_ns.class_("PCM60XComponent", cg.PollingComponent, uart.UARTDevice)
@@ -29,7 +29,7 @@ CONF_CHARGING_POWER = "charging_power"
 CONF_UNIT_TEMPERATURE = "unit_temperature"
 CONF_REMOTE_BATTERY_VOLTAGE = "remote_battery_voltage"
 CONF_REMOTE_BATTERY_TEMPERATURE = "remote_battery_temperature"
-CONF_MAX_OUTPUT_POWER = "max_output_powe"
+CONF_MAX_OUTPUT_POWER = "max_output_power"
 CONF_NOMINAL_BATTERY_VOLTAGE = "nominal_battery_voltage"
 CONF_NOMINAL_CHARGING_CURRENT = "nominal_charging_current"
 CONF_ABSORPTION_VOLTAGE = "absorption_voltage"
@@ -42,15 +42,6 @@ CONF_REMOTE_BATT_VOLTAGE_DETECT = "remote_batt_voltage_detect"
 CONF_REMOTE_TEMP_DETECT = "remote_temp_detect"
 CONF_BATTERY_RATED_VOLTAGE = "battery_rated_voltage"
 CONF_LOW_SHUTDOWN_DETECT = "low_shutdown_detect"
-CONF_WARNING_STATUS_BITS = "warning_status_bits"
-CONF_EQUALIZATION_ENABLED = "equalization_enabled"
-CONF_EQUALIZATION_TIME = "equalization_time"
-CONF_EQUALIZATION_INTERVAL = "equalization_interval"
-CONF_MAX_EQUALIZATION_CURRENT = "max_equalization_current"
-CONF_NEXT_EQUALIZATION_DAYS = "next_equalization_days"
-CONF_EQUALIZATION_VOLTAGE = "equalization_voltage"
-CONF_CV_CHARGE_TIME = "cv_charge_time"
-CONF_EQUALIZATION_TIMEOUT = "equalization_timeout"
 
 
 CONFIG_SCHEMA = cv.Schema({
@@ -126,7 +117,7 @@ CONFIG_SCHEMA = cv.Schema({
         device_class=DEVICE_CLASS_CURRENT,
         icon="mdi:current-dc"
     ),
-    cv.Optional(CONF_NOMINAL_CHARGING_CURRENT): sensor.sensor_schema(
+    cv.Optional(CONF_ABSORPTION_VOLTAGE): sensor.sensor_schema(
         unit_of_measurement=UNIT_VOLT,
         accuracy_decimals=2,
         device_class=DEVICE_CLASS_VOLTAGE,
@@ -155,49 +146,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_REMOTE_TEMP_DETECT): text_sensor.text_sensor_schema(icon="mdi:thermometer"),
     cv.Optional(CONF_BATTERY_RATED_VOLTAGE): text_sensor.text_sensor_schema(icon="mdi:battery-settings"),
     cv.Optional(CONF_LOW_SHUTDOWN_DETECT): text_sensor.text_sensor_schema(icon="mdi:power-settings"),
-    cv.Optional(CONF_WARNING_STATUS_BITS): cv.ensure_list(binary_sensor.binary_sensor_schema()),
-    cv.Optional(CONF_EQUALIZATION_ENABLED): sensor.sensor_schema(
-        unit_of_measurement="",
-        accuracy_decimals=0,
-        icon="mdi:checkbox-marked-circle-outline",
-    ),
-    cv.Optional(CONF_EQUALIZATION_TIME): sensor.sensor_schema(
-        unit_of_measurement="min",
-        accuracy_decimals=0,
-        icon="mdi:timer",
-    ),
-    cv.Optional(CONF_EQUALIZATION_INTERVAL): sensor.sensor_schema(
-        unit_of_measurement="days",
-        accuracy_decimals=0,
-        icon="mdi:calendar-range",
-    ),
-    cv.Optional(CONF_MAX_EQUALIZATION_CURRENT): sensor.sensor_schema(
-        unit_of_measurement="A",
-        accuracy_decimals=0,
-        icon="mdi:current-dc",
-    ),
-    cv.Optional(CONF_NEXT_EQUALIZATION_DAYS): sensor.sensor_schema(
-        unit_of_measurement="days",
-        accuracy_decimals=0,
-        icon="mdi:calendar-range",
-    ),
-    cv.Optional(CONF_EQUALIZATION_VOLTAGE): sensor.sensor_schema(
-        unit_of_measurement="V",
-        accuracy_decimals=2,
-        icon="mdi:flash",
-    ),
-    cv.Optional(CONF_CV_CHARGE_TIME): sensor.sensor_schema(
-        unit_of_measurement="min",
-        accuracy_decimals=0,
-        icon="mdi:timer-sand",
-    ),
-    cv.Optional(CONF_EQUALIZATION_TIMEOUT): sensor.sensor_schema(
-        unit_of_measurement="min",
-        accuracy_decimals=0,
-        icon="mdi:timer-off",
-    ),
-
-}).extend(cv.polling_component_schema("10s")).extend(uart.UART_DEVICE_SCHEMA)
+}).extend(cv.polling_component_schema("5s")).extend(uart.UART_DEVICE_SCHEMA)
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
@@ -289,34 +238,6 @@ async def to_code(config):
     if CONF_LOW_SHUTDOWN_DETECT in config:
         sens = await text_sensor.new_text_sensor(config[CONF_LOW_SHUTDOWN_DETECT])
         cg.add(var.set_low_shutdown_detect_text_sensor(sens))
-    if CONF_WARNING_STATUS_BITS in config:
-        for i, conf in enumerate(config[CONF_WARNING_STATUS_BITS]):
-            sens = await binary_sensor.new_binary_sensor(conf)
-            cg.add(var.set_warning_status_bit_sensor(i, sens))
-    if CONF_EQUALIZATION_ENABLED in config:
-        sens = await sensor.new_sensor(config[CONF_EQUALIZATION_ENABLED])
-        cg.add(var.set_equalization_enabled_sensor(sens))
-    if CONF_EQUALIZATION_TIME in config:
-        sens = await sensor.new_sensor(config[CONF_EQUALIZATION_TIME])
-        cg.add(var.set_equalization_time_sensor(sens))
-    if CONF_EQUALIZATION_INTERVAL in config:
-        sens = await sensor.new_sensor(config[CONF_EQUALIZATION_INTERVAL])
-        cg.add(var.set_equalization_interval_sensor(sens))
-    if CONF_MAX_EQUALIZATION_CURRENT in config:
-        sens = await sensor.new_sensor(config[CONF_MAX_EQUALIZATION_CURRENT])
-        cg.add(var.set_max_equalization_current_sensor(sens))
-    if CONF_NEXT_EQUALIZATION_DAYS in config:
-        sens = await sensor.new_sensor(config[CONF_NEXT_EQUALIZATION_DAYS])
-        cg.add(var.set_next_equalization_days_sensor(sens))
-    if CONF_EQUALIZATION_VOLTAGE in config:
-        sens = await sensor.new_sensor(config[CONF_EQUALIZATION_VOLTAGE])
-        cg.add(var.set_equalization_voltage_sensor(sens))
-    if CONF_CV_CHARGE_TIME in config:
-        sens = await sensor.new_sensor(config[CONF_CV_CHARGE_TIME])
-        cg.add(var.set_cv_charge_time_sensor(sens))
-    if CONF_EQUALIZATION_TIMEOUT in config:
-        sens = await sensor.new_sensor(config[CONF_EQUALIZATION_TIMEOUT])
-        cg.add(var.set_equalization_timeout_sensor(sens))
- 
+        
 
 
