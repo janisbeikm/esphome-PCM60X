@@ -70,6 +70,15 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   text_sensor::TextSensor *battery_rated_voltage_text_{nullptr};
   text_sensor::TextSensor *low_shutdown_detect_text_{nullptr};
   binary_sensor::BinarySensor *warning_status_bits_[30] = {nullptr};
+  sensor::Sensor *equalization_enabled_sensor_{nullptr};
+  sensor::Sensor *equalization_time_sensor_{nullptr};
+  sensor::Sensor *equalization_interval_sensor_{nullptr};
+  sensor::Sensor *max_equalization_current_sensor_{nullptr};
+  sensor::Sensor *next_equalization_days_sensor_{nullptr};
+  sensor::Sensor *equalization_voltage_sensor_{nullptr};
+  sensor::Sensor *cv_charge_time_sensor_{nullptr};
+  sensor::Sensor *equalization_timeout_sensor_{nullptr};
+
 
 };
 

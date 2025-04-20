@@ -333,6 +333,30 @@ void PCM60XComponent::parse_qbeqi_(const std::string &data) {
   ESP_LOGD(TAG, "Equalization Voltage: %.2f V", eq_voltage);
   ESP_LOGD(TAG, "C.V. Charge Time: %d min", cv_charge_time);
   ESP_LOGD(TAG, "Equalization Timeout: %d min", eq_timeout);
+  if (this->equalization_enabled_sensor_ != nullptr)
+    this->equalization_enabled_sensor_->publish_state(eq_enabled);
+
+  if (this->equalization_time_sensor_ != nullptr)
+    this->equalization_time_sensor_->publish_state(eq_time_min);
+
+  if (this->equalization_interval_sensor_ != nullptr)
+    this->equalization_interval_sensor_->publish_state(eq_interval_days);
+
+  if (this->max_equalization_current_sensor_ != nullptr)
+    this->max_equalization_current_sensor_->publish_state(max_eq_current);
+
+  if (this->next_equalization_days_sensor_ != nullptr)
+    this->next_equalization_days_sensor_->publish_state(next_eq_days);
+
+  if (this->equalization_voltage_sensor_ != nullptr)
+    this->equalization_voltage_sensor_->publish_state(eq_voltage);
+
+  if (this->cv_charge_time_sensor_ != nullptr)
+    this->cv_charge_time_sensor_->publish_state(cv_charge_time);
+
+  if (this->equalization_timeout_sensor_ != nullptr)
+    this->equalization_timeout_sensor_->publish_state(eq_timeout);
+
 }
 
 
