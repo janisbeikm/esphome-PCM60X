@@ -273,55 +273,27 @@ void PCM60XComponent::parse_qpiri_(const std::string &data) {
 }
 
 void PCM60XComponent::parse_qpiws_(const std::string &data) {
-  std::string cleaned_data = data;
-  if (!cleaned_data.empty() && cleaned_data[0] == '(') {
-    cleaned_data = cleaned_data.substr(1);
-  }
-
-  if (cleaned_data.size() < 30) {
-    ESP_LOGW(TAG, "QPIWS response too short, expected 30 bits but got %d", cleaned_data.size());
-    return;
-  }
-
-  ESP_LOGD(TAG, "QPIWS decoded warnings/faults:");
+  if (data.empty() || data[0] != '(') return;
+  std::string bitfield = data.substr(1);
 
   const char* labels[30] = {
-    "Over charge current fault",         // a01
-    "Over temperature fault",            // a02
-    "Battery voltage under fault",       // a03
-    "Battery voltage high fault",        // a04
-    "PV high loss fault",                // a05
-    "Battery temp too low fault",        // a06
-    "Battery temp too high fault",       // a07
-    "Reserved",                          // a08
-    "Reserved",                          // a09
-    "Reserved",                          // a10
-    "Reserved",                          // a11
-    "Reserved",                          // a12
-    "Reserved",                          // a13
-    "Reserved",                          // a14
-    "Reserved",                          // a15
-    "Reserved",                          // a16
-    "Reserved",                          // a17
-    "Reserved",                          // a18
-    "Reserved",                          // a19
-    "PV low loss warning",               // a20
-    "PV high derating warning",          // a21
-    "Temp high derating warning",        // a22
-    "Battery temp low alarm warning",    // a23
-    "Reserved",                          // a24
-    "Reserved",                          // a25
-    "Reserved",                          // a26
-    "Reserved",                          // a27
-    "Reserved",                          // a28
-    "Reserved",                          // a29
-    "Battery low warning (AS400 only)"   // a30
+    "Over charge current fault", "Over temperature fault", "Battery voltage under fault",
+    "Battery voltage high fault", "PV high loss fault", "Battery temp too low fault",
+    "Battery temp too high fault", "Reserved", "Reserved", "Reserved",
+    "Reserved", "Reserved", "Reserved", "Reserved", "Reserved",
+    "Reserved", "Reserved", "Reserved", "Reserved", "PV low loss warning",
+    "PV high derating warning", "Temp high derating warning", "Battery temp low alarm warning",
+    "Reserved", "Reserved", "Reserved", "Reserved", "Reserved", "Reserved",
+    "Battery low warning (AS400 only)"
   };
 
-  for (size_t i = 0; i < 30 && i < cleaned_data.size(); ++i) {
-    char bit = cleaned_data[i];
-    const char* state = (bit == '1') ? "ACTIVE" : "OK";
-    ESP_LOGD(TAG, "Bit %02d: %s - %s", static_cast<int>(i + 1), labels[i], state);
+  for (size_t i = 0; i < bitfield.size() && i < 30; i++) {
+    bool active = bitfield[i] == '1';
+    ESP_LOGD(TAG, "Bit %02d: %s - %s", static_cast<int>(i + 1), labels[i], active ? "ACTIVE" : "OK");
+
+    if (this->warning_status_bits_[i] != nullptr) {
+      this->warning_status_bits_[i]->publish_state(active);
+    }
   }
 }
 

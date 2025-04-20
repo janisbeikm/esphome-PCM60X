@@ -36,7 +36,8 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   void set_remote_temp_detect_text(text_sensor::TextSensor *s) { remote_temp_detect_text_ = s; }
   void set_battery_rated_voltage_text(text_sensor::TextSensor *s) { battery_rated_voltage_text_ = s; }
   void set_low_shutdown_detect_text(text_sensor::TextSensor *s) { low_shutdown_detect_text_ = s; }
-
+  void set_warning_status_bit_sensor(int index, binary_sensor::BinarySensor *sensor) {
+    if (index >= 0 && index < 30) warning_status_bits_[index] = sensor;
  protected:
   void send_command_(const std::string &command);
   std::string receive_response_();
@@ -68,7 +69,7 @@ class PCM60XComponent : public PollingComponent, public uart::UARTDevice {
   text_sensor::TextSensor *remote_temp_detect_text_{nullptr};
   text_sensor::TextSensor *battery_rated_voltage_text_{nullptr};
   text_sensor::TextSensor *low_shutdown_detect_text_{nullptr};
-
+  binary_sensor::BinarySensor *warning_status_bits_[30] = {nullptr};
 
 };
 
